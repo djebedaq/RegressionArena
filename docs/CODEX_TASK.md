@@ -1,6 +1,6 @@
 # Codex Task RA-001 — ship a trustworthy v0.2 prototype
 
-**Status:** READY FOR CODEX; do not claim runtime success without a Studio run.
+**Status:** RA-001 implementation prepared for review; offline evidence is in `RA-001_VERIFICATION.md`. Studio acceptance B–G remains UNVERIFIED. Do not claim runtime success without a Studio run.
 
 ## Objective
 

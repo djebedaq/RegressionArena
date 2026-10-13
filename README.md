@@ -1,56 +1,53 @@
-# Regression Arena — prototype v0.1
+# Regression Arena — v0.2 prototype
 
-**Status:** source-code MVP, not yet validated in Roblox Studio or approved for Creator Store sale.
+**Status: RA-001 implementation; Roblox Studio runtime validation remains UNVERIFIED. Not production-ready or approved for sale.**
 
-A fully local Roblox Studio plugin for simple multiplayer smoke testing.
-Uses the official `StudioTestService` API. No subscription, server or AI key.
+Regression Arena runs repeatable multiplayer smoke checks in a local Roblox Studio place copy. Select `join`, `spawn`, and `latejoin` independently, choose 1/2/4 initial players, and give each case a whole-number timeout of 5–60 seconds (default 20). Each case starts its own multiplayer session. Latejoin requests one additional player after the initial group joins.
 
-## What works in the source
-- One-click installation of a versioned server-side test runner in `ServerScriptService`.
-- Player options: 1, 2, 4.
-- Tests: simultaneous join, character spawn with Humanoid, late join.
-- Returns PASS/FAIL, explanations, latency, JSON report.
-- Saves last ten results in the plugin's local settings.
-- Never performs external network requests or changes published game servers.
+A PASS requires a matching run identifier, strict result schema, and scenario evidence. Reports include expected/observed behavior, elapsed seconds, counts, and a suggested next check. A timed-out, cancelled, malformed, or stale result cannot become PASS. Infrastructure failure aborts the remaining cases with explicit “not run” failures.
 
-## Try it in Roblox Studio (manual runtime validation required)
-1. Download `dist/RegressionArena.plugin.luau` from this archive.
-2. In Roblox Studio, open a **copy** of a simple testing place. Enable **Plugin Debugging Enabled** in Studio settings.
-3. Under `ServerStorage`, create a `Script` named `RegressionArena` and replace its Source with the contents of `dist/RegressionArena.plugin.luau`.
-4. Select the script, then choose **Plugins > Save as Local Plugin**.
-5. Open the new plugin via the toolbar (it appears in `PluginDebugService`). Delete the original script from `ServerStorage` after saving.
-6. Click **Install / update test runner**, select 2 players, and click **Run 3 test scenarios**.
-7. Confirm each test session exits automatically and that a PASS/FAIL summary is displayed.
-8. Repeat on a place with `Players.CharacterAutoLoads=false` to verify `spawn` correctly fails or times out rather than claiming success.
+## Install and run locally
 
-**Note:** The installed runner lives in `ServerScriptService`; it does not run in published servers because of the `RunService:IsStudio()` guard. Remove the runner script when you no longer need it. It is shipped with the place if left there, even though it returns immediately outside Studio.
+1. Open a **disposable, local copy** of a simple place. Game scripts still execute during tests; keep production credentials, live data access, purchases, and external integrations out of this copy. Regression Arena does not intercept game code or sandbox its side effects.
+2. Enable **Plugin Debugging Enabled** in Studio settings. Insert a temporary `Script` named `RegressionArena` under `ServerStorage`; paste `dist/RegressionArena.plugin.luau` into its Source.
+3. Select it and use **Plugins → Save as Local Plugin**. Delete the temporary Script. Open Regression Arena using its toolbar button.
+4. In edit mode, click **Install / update owned test runner**. The sole place asset created is `ServerScriptService.RegressionArena_TestRunner`, with `RAOwner=RegressionArena`, `RAVersion=0.2.0`, and server Legacy run context. Installation/removal use undo recordings.
+5. Select the player count, toggle cases, and enter the timeout under each case. Click **Run selected test plan**. The vertically scrolling panel remains usable in a small dock.
+6. Inspect the counts and diagnosis. Click Results and use Ctrl+A / Ctrl+C to copy text and JSON. **Show last saved report** is explicitly labeled as a previous run.
+7. **Save local preset** / **Load local preset** retain one plan in plugin settings, without adding game assets. History retains at most ten reports, each at most 8 KiB. The preset is at most 2 KiB when loaded. Writes are checked by immediate readback; settings errors do not turn a failed test into success.
 
-## Developer commands
+## Update, remove and recover
+
+- Repeating Install is idempotent. For an unchanged v0.2 runner, it also repairs a disabled script or incorrect run context.
+- A matching name alone is never ownership. Duplicate names, missing ownership/version attributes, unsupported versions, changed Source, unsaved editor changes, and child content all block running/updating/removing that runner.
+- **v0.1 migration:** its untagged runner is deliberately not adopted. In your disposable place, inspect and preserve it yourself, then rename it out of the reserved name or manually remove it only after confirming it contains no work to keep. Install v0.2 afterward.
+- Before loading a future plugin build with different runner source, use the **old build's Remove owned test runner** first. Then reload the local plugin and install the new runner. There is no automatic overwrite of unknown or modified runner content.
+- **Remove owned test runner** detaches only the exact owned, unmodified runner in edit mode. Undo restores it. Other scripts and player data are not touched by the plugin.
+- **Cancel / retry session cleanup** requests cancellation for the plugin's pending session. The plugin watchdog allows the case timeout plus 30 seconds for launch/transport, then up to 5 seconds for cleanup; a completed call may also need up to 5 seconds for edit mode to settle.
+- The UI recovers to a failure report, but another native test remains blocked until the outstanding call actually returns **and** edit mode is confirmed. If Studio ignores cancellation, use Studio's Stop button. If the engine remains hung, reopen the disposable place. Closing the panel merely hides it; unloading the plugin requests cancellation.
+- Outside Studio, the runner returns before accessing test services. In Studio it also requires server context and valid v0.2 test arguments. Ordinary unmarked playtests receive no scenario execution, player additions, or EndTest calls.
+- The installed Script is included if you save/publish the place with it present. Remove it before shipping your game. This task does not publish anything.
+
+## Developer checks
+
+`src/` is authoritative. Never edit generated distribution code.
 
 ```bash
 python scripts_build.py
 python -m unittest discover -s tests -v
 ```
 
-## What is NOT ready
-- No actual Roblox Studio execution was possible in this environment.
-- The embedded runner's `StudioTestService:AddPlayers()` path and cross-context serialization must be exercised in Studio.
-- No tests for game-specific RemoteEvents, purchases, combat, matchmaking, or data stores.
-- No paid seller listing, identity checks, payout setup, images, or review approval.
+Python uses only the standard library. For Luau mock execution and syntax compilation, install the official [Luau CLI 0.742](https://github.com/luau-lang/luau/releases/tag/0.742), put the tools on PATH, or set `LUAU_BIN` and `LUAU_COMPILE_BIN`. A local `.tools/luau/` installation is also detected and ignored by Git. Without tools, those tests explicitly report SKIPPED; build/integrity checks still run. CI installs the pinned official Linux release with a SHA-256 check and requires all tests, plus an unchanged rebuilt distribution.
 
-## Source references
-- https://create.roblox.com/docs/reference/engine/classes/StudioTestService
-- https://create.roblox.com/docs/studio/plugins
-- https://create.roblox.com/docs/production/creator-store
+The Luau tests execute the actual protocol, scenario, session, installation and history modules against mocks, including the generated server boundary. **They do not execute Roblox Studio, validate API permissions, or demonstrate real multiplayer success.** See [offline verification](docs/RA-001_VERIFICATION.md), [API audit](docs/API_AUDIT.md), and the exact [Studio validation procedure](docs/STUDIO_VALIDATION.md).
 
-## Codex handoff
+No network requests, telemetry, accounts, AI API, subscriptions, licensing or payment layer are implemented. HttpService is used only for local JSON encoding/decoding and random run identifiers. Reports contain counts and predefined diagnoses, not game source, player names, or user IDs. Only the owned runner source is inspected for integrity.
 
-This archive is ready to be put in a **new private GitHub repository** and opened as a Codex coding task.
+Custom spawn systems must produce parented characters with Humanoids to pass the current spawn assertion. No client UI, game remotes, purchases, combat, matchmaking, or data-store assertions are implemented. A paid-feature proposal stays behind the human Studio-validation gate defined in RA-001.
 
-- Start with `CODEX_START_HERE.md` (copy that file as the Codex prompt).
-- `AGENTS.md` tells Codex how to work in this codebase.
-- `docs/CODEX_TASK.md` defines the v0.2 deliverables and acceptance criteria.
-- `docs/STUDIO_VALIDATION.md` contains manual Roblox Studio acceptance tests.
-- `.github/workflows/python-checks.yml` runs build and *structural* tests on commits.
+## Working instructions and references
 
-The current Python test suite verifies source packaging and guardrails only. **No Roblox Studio run has been performed and this is not ready for sale.**
+Start with [AGENTS.md](AGENTS.md), [CODEX_START_HERE.md](CODEX_START_HERE.md), and [RA-001](docs/CODEX_TASK.md).
+
+- [Official StudioTestService API](https://create.roblox.com/docs/reference/engine/classes/StudioTestService)
+- [Official Studio plugin guide](https://create.roblox.com/docs/studio/plugins)
