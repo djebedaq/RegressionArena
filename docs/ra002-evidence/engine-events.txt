@@ -1,0 +1,4 @@
+Selected actual RA-002 Studio Output and native lifecycle events; no raw logs or identities.
+2026-10-14T04:04:18.200Z RA002_NATIVE fixture installed; runner absent true
+2026-10-14T04:06:09.161Z RA002_NATIVE observer started; no RA runner true
+2026-10-14T04:06:09.162Z RA002_NATIVE expected 4 players 0 ready 0 serverElapsed 0

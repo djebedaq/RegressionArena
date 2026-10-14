@@ -1,0 +1,169 @@
+Actual offline command output; NOT Roblox Studio execution.
+2026-10-14T04:18:20.162054+00:00
+3.14.6 (tags/v3.14.6:c63aec6, Jun 10 2026, 10:26:10) [MSC v.1944 64 bit (AMD64)]
+
+$ python scripts_build.py
+STDOUT:
+D:\RegressionArena-main\RegressionArena-main\dist\RegressionArena.plugin.luau
+STDERR:
+
+EXIT STATUS: 0
+
+$ python -m unittest discover -s tests -v
+STDOUT:
+
+PASS published runtime returns before accessing test services
+PASS client context returns before accessing test services
+PASS ordinary playtest with no args remains inert
+PASS nil startup handoff is retried only a bounded number of times
+PASS argument API failure and malformed JSON remain inert
+PASS valid marked join reports proven success once
+PASS EndTest failure warns without a client-only fallback or retrying PASS
+PASS server AddPlayers exception becomes diagnostic failure
+PASS server watchdog preserves spawn counts and actionable diagnosis
+MOCK TESTS: 9 passed; no Roblox Studio execution
+
+PASS install is explicit, versioned and idempotent
+PASS same-version update repairs disabled server context
+PASS unowned matching script is never overwritten or removed
+PASS wrong class, version, edited source or child content blocks mutation
+PASS duplicates fail closed
+PASS unsaved editor changes block update and removal
+PASS remove touches only exact owned runner
+PASS Source write refusal leaves no partially installed asset
+PASS undo recording refusal changes no game content
+PASS failed install commit rolls back candidate
+PASS failed removal commit restores the same runner
+PASS failed repair commit restores original enabled state and context
+PASS active playtest refuses install and removal
+MOCK TESTS: 13 passed; no Roblox Studio execution
+
+PASS history recomputes totals, retains date and strips unknown fields
+PASS malformed, sparse, duplicate and mismatched summaries are rejected
+PASS oversized and non-string settings are never decoded
+PASS damaged JSON and encode exceptions are isolated
+PASS history reads at most ten bounded reports even from oversized storage
+PASS appending reports retains only ten most recent entries
+PASS oversized newly encoded report cannot enter history
+PASS settings save confirms scalar and history readback
+PASS silent write failure, conflict and read errors are visible
+MOCK TESTS: 9 passed; no Roblox Studio execution
+
+PASS plan copies only known fields and never aliases saved input
+PASS plan rejects empty, duplicate, sparse and named cases
+PASS plan rejects noninteger, out-of-range and nonfinite timeouts
+PASS slow local client startup can use the bounded 180-second budget
+PASS request refuses wrong marker, unknown scenario, invalid count and missing nonce
+PASS all three success contracts accept matching measured evidence
+PASS reject stale or mismatched result identity and plan
+PASS never turn truthy fields into PASS
+PASS spawn success requires all expected players and characters
+PASS latejoin success requires retention and exactly one new identity
+PASS reject negative, NaN, infinite or late successful elapsed
+PASS failure retains actual elapsed time including launch or delayed cleanup
+PASS whitelist removes arbitrary payload fields from persistence
+PASS malformed result fields and oversized diagnostics are rejected
+MOCK TESTS: 14 passed; no Roblox Studio execution
+
+PASS join and spawn pass for exactly 1, 2 and 4 players
+PASS zero or insufficient players time out with counts
+PASS extra players cannot satisfy exact count
+PASS CharacterAutoLoads false is a reproducible failing spawn
+PASS partial spawn fails with useful readiness count
+PASS disconnected players cannot make empty spawn vacuously pass
+PASS all phases share one bounded timeout
+PASS condition first observed at deadline fails
+PASS latejoin adds exactly one after baseline for all player modes
+PASS latejoin fails when AddPlayers adds nobody
+PASS latejoin count cannot hide replacement of an initial player
+PASS AddPlayers API errors propagate to protected server boundary
+MOCK TESTS: 12 passed; no Roblox Studio execution
+
+PASS valid session returns only matching proven result and releases ownership
+PASS normal edit-mode transition may settle without discarding success
+PASS Execute API errors become failure and allow retry
+PASS unexpected native table result fails closed
+PASS oversized native result fails before decoding
+PASS malformed JSON and stale nonce fail closed
+PASS watchdog does not unlock unresolved native call or accept late PASS
+PASS cancellation discards results and retains pending native ownership
+PASS native completion just beyond watchdog deadline cannot sneak through polling
+PASS unload requests cleanup and never permits another run
+PASS without server EndTest a cancelled native call stays locked
+PASS unrelated active playtest is never stopped or executed over
+PASS cleanup-required result never earns PASS
+PASS back-to-back runs do not retain stale successful state
+PASS native completion waits for stable edit mode before the next launch
+MOCK TESTS: 15 passed; no Roblox Studio execution
+STDERR:
+test_ci_requires_build_clean_generated_diff_and_luau (test_integrity.IntegrityChecks.test_ci_requires_build_clean_generated_diff_and_luau) ... ok
+test_cleanup_never_calls_client_only_leave_or_persists_simulation (test_integrity.IntegrityChecks.test_cleanup_never_calls_client_only_leave_or_persists_simulation) ... ok
+test_no_external_network_dynamic_code_or_game_data_access (test_integrity.IntegrityChecks.test_no_external_network_dynamic_code_or_game_data_access) ... ok
+test_published_and_client_guards_precede_test_service_access (test_integrity.IntegrityChecks.test_published_and_client_guards_precede_test_service_access) ... ok
+test_source_mutation_is_limited_to_off_tree_candidate (test_integrity.IntegrityChecks.test_source_mutation_is_limited_to_off_tree_candidate) ... ok
+test_all_modules_and_both_generated_contexts_compile (test_luau.LuauChecks.test_all_modules_and_both_generated_contexts_compile) ... ok
+test_generated_server_boundary_with_mock_services (test_luau.LuauChecks.test_generated_server_boundary_with_mock_services) ... ok
+test_install_remove_ownership_and_rollback (test_luau.LuauChecks.test_install_remove_ownership_and_rollback) ... ok
+test_local_history_bounds_and_sanitization (test_luau.LuauChecks.test_local_history_bounds_and_sanitization) ... ok
+test_protocol_contracts (test_luau.LuauChecks.test_protocol_contracts) ... ok
+test_runner_scenarios (test_luau.LuauChecks.test_runner_scenarios) ... ok
+test_session_timeout_cancellation_and_recovery (test_luau.LuauChecks.test_session_timeout_cancellation_and_recovery) ... ok
+test_build_cli_runs_from_unrelated_directory (test_package.BuildChecks.test_build_cli_runs_from_unrelated_directory) ... ok
+test_build_is_byte_deterministic_and_lf_utf8 (test_package.BuildChecks.test_build_is_byte_deterministic_and_lf_utf8) ... ok
+test_embedded_runner_is_exact_complete_render (test_package.BuildChecks.test_embedded_runner_is_exact_complete_render) ... ok
+test_generated_matches_source_exactly (test_package.BuildChecks.test_generated_matches_source_exactly) ... ok
+test_marker_replacement_does_not_silently_accept_multiple_targets (test_package.BuildChecks.test_marker_replacement_does_not_silently_accept_multiple_targets) ... ok
+test_missing_or_duplicate_markers_fail_build (test_package.BuildChecks.test_missing_or_duplicate_markers_fail_build) ... ok
+test_runner_delimiter_collision_is_rejected (test_package.BuildChecks.test_runner_delimiter_collision_is_rejected) ... ok
+
+----------------------------------------------------------------------
+Ran 19 tests in 31.983s
+
+OK
+EXIT STATUS: 0
+
+$ python scripts_studio_validation.py
+STDOUT:
+D:\RegressionArena-main\RegressionArena-main\.tools\studio-validation\ownership-validation.command.luau
+D:\RegressionArena-main\RegressionArena-main\.tools\studio-validation\ownership-validation.plugin.luau
+STDERR:
+
+EXIT STATUS: 0
+
+$ D:\RegressionArena-main\RegressionArena-main\.tools\luau\luau-compile.exe --null .tools/studio-validation/ownership-validation.command.luau
+STDOUT:
+Compiled 0 KLOC into 8 KB bytecode (read 0.09s, parse 0.00s, compile 0.00s)
+STDERR:
+
+EXIT STATUS: 0
+
+$ D:\RegressionArena-main\RegressionArena-main\.tools\luau\luau-compile.exe --null .tools/studio-validation/ownership-validation.plugin.luau
+STDOUT:
+Compiled 0 KLOC into 9 KB bytecode (read 0.07s, parse 0.00s, compile 0.00s)
+STDERR:
+
+EXIT STATUS: 0
+
+$ D:\RegressionArena-main\RegressionArena-main\.tools\luau\luau-compile.exe --null tests/studio/Observer.server.luau
+STDOUT:
+Compiled 0 KLOC into 1 KB bytecode (read 0.01s, parse 0.00s, compile 0.00s)
+STDERR:
+
+EXIT STATUS: 0
+
+$ D:\RegressionArena-main\RegressionArena-main\.tools\luau\luau-compile.exe --null tests/studio/NativeObserver.server.luau
+STDOUT:
+Compiled 0 KLOC into 1 KB bytecode (read 0.28s, parse 0.00s, compile 0.00s)
+STDERR:
+
+EXIT STATUS: 0
+
+Generated distribution SHA-256: b720bc1fad06863421b99feaa278039b52ab9a9788ea070e702d95cba64d6b97
+
+Whitespace check 2026-10-14T04:28:21.987033+00:00
+$ git diff --check
+STDOUT:
+
+STDERR:
+
+EXIT STATUS: 0

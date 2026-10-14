@@ -1,0 +1,28 @@
+name: Build and offline checks
+on:
+  push:
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      LUAU_BIN: /tmp/ra-luau/luau
+      LUAU_COMPILE_BIN: /tmp/ra-luau/luau-compile
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.14'
+      - name: Install pinned official Luau developer tools
+        run: |
+          curl --fail --location --retry 2 --max-time 60 https://github.com/luau-lang/luau/releases/download/0.742/luau-ubuntu.zip -o /tmp/ra-luau.zip
+          echo '152058b98c60ff1f5b5ec9bca0b8eb37793cae161dd3a05608cc3d8738ba1a4d  /tmp/ra-luau.zip' | sha256sum --check
+          mkdir -p /tmp/ra-luau
+          unzip -q /tmp/ra-luau.zip -d /tmp/ra-luau
+          chmod +x /tmp/ra-luau/luau /tmp/ra-luau/luau-compile
+      - run: python scripts_build.py
+      - run: git diff --exit-code -- dist/
+      - run: python -m unittest discover -s tests -v
