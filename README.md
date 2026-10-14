@@ -2,6 +2,8 @@
 
 **Status: RA-001 implementation with real Roblox Studio evidence. Validation is incomplete; see the recorded PASS/FAIL/UNVERIFIED matrix. Not production-ready or approved for sale.**
 
+[RA-002 diagnostics](docs/RA-002_DIAGNOSTICS.md) continue the native-control and two-player stability investigation in the same Draft PR. The independent four-client control also encountered environment/UI responsiveness failures; reliable two-player repeatability is still pending.
+
 Regression Arena runs repeatable multiplayer smoke checks in a local Roblox Studio place copy. Select `join`, `spawn`, and `latejoin` independently, choose 1/2/4 initial players, and give each case a whole-number timeout of 5–180 seconds (default 60). Each case starts its own multiplayer session. Latejoin requests one additional player after the initial group joins. Slower machines can need a larger budget for local client startup.
 
 A PASS requires a matching run identifier, strict result schema, and scenario evidence. Reports include expected/observed behavior, elapsed seconds, counts, and a suggested next check. A timed-out, cancelled, malformed, or stale result cannot become PASS. Infrastructure failure aborts the remaining cases with explicit “not run” failures.

@@ -24,6 +24,8 @@ Other API checks:
 
 ## Runtime findings and remaining assumptions
 
+RA-002's independent standard Server & Clients control, without the RA runner, encountered native/UI responsiveness failures on 2026-10-14. Resource measurements and the failed Computer Use recovery are recorded in [RA-002_DIAGNOSTICS.md](RA-002_DIAGNOSTICS.md). This is evidence of a confounding environment problem, not proof that StudioTestService differs from native testing. Final four-client connection and the two-client comparison remain UNVERIFIED until UI control is restored.
+
 1. Server GetTestArgs, EndTest and AddPlayers were exercised successfully in Studio 0.742.0.7421053, including a real latejoin from 1 to 2 players. The full 1/2/4 matrix remains subject to the validation record.
 2. A loaded server recorded `Arg not received due to timeout` during one launch; the runner then stayed inert and the plugin failed through its watchdog. Nil arguments now receive at most three reads, one second apart; errors and non-nil unrelated markers exit immediately. Even after retries, missing arguments must never authorize EndTest on an unmarked session.
 3. Matching JSON requests/results were transported in actual successful runs. An explicit malformed payload and a replay of an actual old valid join PASS with the previous nonce were both rejected by the current plugin, yielding 0/3 FAIL and remaining cases not run (ST-13).

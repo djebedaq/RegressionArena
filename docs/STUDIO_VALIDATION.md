@@ -4,6 +4,8 @@ Real tests were run with Computer Use in Roblox Studio **0.742.0.7421053**, Wind
 
 The complete acceptance gate has **not passed**. One-player suites passed twice in sequence; all three scenarios have positive evidence with two players across separate runs. Four-player attempts failed, including an isolated 180-second join with only two observed clients and native built-in plugin responsiveness failures. Partial rows explicitly identify UNVERIFIED subcases. Successful cases must not erase earlier failures.
 
+RA-002 follow-up on 2026-10-14: the independent native four-client control also encountered severe environment/UI responsiveness failures with no RA runner installed. Computer Use recovery failed; the native two-client control and three consecutive full two-player plans remain UNVERIFIED in that run. See [RA-002 diagnostics and measured resource limits](RA-002_DIAGNOSTICS.md). This does not change the PASS/FAIL attribution of the earlier RA-001 reports.
+
 ## Preparation
 
 1. Use a disposable **local copy** of a simple baseplate with normal spawning. Do not use a live production place or production data access. The plugin does not sandbox the game's own scripts.
