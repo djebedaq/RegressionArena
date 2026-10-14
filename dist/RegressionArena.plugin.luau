@@ -11,7 +11,7 @@ local Protocol = {}
 Protocol.MARKER = "RegressionArenaV02"
 Protocol.VERSION = 2
 Protocol.MIN_TIMEOUT = 5
-Protocol.MAX_TIMEOUT = 60
+Protocol.MAX_TIMEOUT = 180
 Protocol.MAX_REPORT_BYTES = 8192
 Protocol.HISTORY_LIMIT = 10
 Protocol.SCENARIOS = { "join", "spawn", "latejoin" }
@@ -202,15 +202,27 @@ local Session = (function()
 local Session = {}
 Session.__index = Session
 Session.STARTUP_ALLOWANCE = 30
-Session.CLEANUP_ALLOWANCE = 5
+Session.CLEANUP_ALLOWANCE = 10
+-- Studio 0.742 may expose edit mode before its previous Stop action is delivered.
+-- Starting immediately allowed that action to terminate the next native test.
+Session.EDIT_SETTLE_TIME = 3
 
 function Session.new(protocol, env)
     return setmetatable({ protocol = protocol, env = env, pending = nil, disposed = false }, Session)
 end
 
+function Session:recovered(operation)
+    if not operation.done or not self.env.isEdit() then
+        operation.editSince = nil
+        return false
+    end
+    operation.editSince = operation.editSince or self.env.now()
+    return self.env.now() - operation.editSince >= Session.EDIT_SETTLE_TIME
+end
+
 function Session:ready()
     if self.disposed then return false end
-    if self.pending and self.pending.done and self.env.isEdit() then self.pending = nil end
+    if self.pending and self:recovered(self.pending) then self.pending = nil end
     return self.pending == nil and self.env.isEdit()
 end
 
@@ -218,10 +230,8 @@ function Session:cancel()
     local operation = self.pending
     if not operation then return end
     operation.cancelled = true
-    local ok, err = pcall(function()
-        if self.env.canLeave() then self.env.leave() end
-    end)
-    if not ok then self:logError(err) end
+    -- StudioTestService has no plugin-side session-stop API. LeaveTest is client-only.
+    -- Discard the result and retain ownership until the server's EndTest/deadline returns.
 end
 
 function Session:logError(message)
@@ -252,26 +262,19 @@ function Session:run(request)
     -- A completion observed after the plugin deadline cannot bypass the watchdog.
     local timedOut = not operation.cancelled and env.now() >= deadline
     if timedOut then self:cancel() end
-    if operation.done and not operation.cancelled then
-        -- Execute can return just before Studio exposes edit mode. Allow that transition to settle.
-        local settleDeadline = env.now() + Session.CLEANUP_ALLOWANCE
-        while not env.isEdit() and env.now() < settleDeadline do env.wait(0.1) end
-    end
-    if operation.cancelled or not env.isEdit() then
-        self:cancel()
-        local cleanupDeadline = env.now() + Session.CLEANUP_ALLOWANCE
-        while (not operation.done or not env.isEdit()) and env.now() < cleanupDeadline do env.wait(0.1) end
-    end
-    local recovered = operation.done and env.isEdit()
+    local cleanupDeadline = env.now() + Session.CLEANUP_ALLOWANCE
+    while not self:recovered(operation) and env.now() < cleanupDeadline do env.wait(0.1) end
+    local recovered = self:recovered(operation)
     if recovered then self.pending = nil end
     if timedOut then return fail("Plugin watchdog timeout; no verified scenario result") end
-    if operation.cancelled then return fail("Test cancelled or session cleanup was required; result discarded") end
+    if operation.cancelled then return fail("Results cancelled; waiting for server EndTest or Studio Stop if still active") end
     if not recovered then return fail("Native test did not return safely to edit mode") end
     if not operation.ok then
         self:logError(operation.raw)
         return fail("ExecuteMultiplayerTestAsync failed; no verified result")
     end
     if type(operation.raw) ~= "string" or #operation.raw > protocol.MAX_REPORT_BYTES then
+        self:logError("Unexpected EndTest transport type: " .. type(operation.raw))
         return fail("Unexpected or oversized EndTest result")
     end
     local decoded, value = pcall(env.decode, operation.raw)
@@ -374,7 +377,7 @@ local Protocol = {}
 Protocol.MARKER = "RegressionArenaV02"
 Protocol.VERSION = 2
 Protocol.MIN_TIMEOUT = 5
-Protocol.MAX_TIMEOUT = 60
+Protocol.MAX_TIMEOUT = 180
 Protocol.MAX_REPORT_BYTES = 8192
 Protocol.HISTORY_LIMIT = 10
 Protocol.SCENARIOS = { "join", "spawn", "latejoin" }
@@ -552,8 +555,14 @@ return Core
 
 end)()
 
--- No speculative polling in ordinary playtests. A missing marker means no action.
-local argsOK, raw = pcall(function() return StudioTestService:GetTestArgs() end)
+-- Studio 0.742 can time out the initial argument handoff under local startup load.
+-- Retry nil only, at most three reads. Unmarked tests still perform no test actions.
+local argsOK, raw
+for attempt = 1, 3 do
+    argsOK, raw = pcall(function() return StudioTestService:GetTestArgs() end)
+    if not argsOK or raw ~= nil then break end
+    if attempt < 3 then task.wait(1) end
+end
 if not argsOK or type(raw) ~= "string" or #raw > 2048 then return end
 local decoded, request = pcall(function() return HttpService:JSONDecode(raw) end)
 if not decoded or not Protocol.validRequest(request) then return end
@@ -577,11 +586,8 @@ local function finish(value)
         StudioTestService:EndTest(HttpService:JSONEncode(value))
     end)
     if not ok then
-        warn("Regression Arena: EndTest failed; plugin watchdog must stop this test.", err)
-        -- Never resend a PASS after an ambiguous EndTest failure.
-        pcall(function()
-            if StudioTestService:CanLeaveTest() then StudioTestService:LeaveTest() end
-        end)
+        warn("Regression Arena: EndTest failed. Use Studio Stop; LeaveTest is client-only.", err)
+        -- No supported server fallback. Never resend a PASS after an ambiguous failure.
     end
 end
 
@@ -628,8 +634,6 @@ end
 local session = Session.new(Protocol, {
     now = os.clock, wait = task.wait, spawn = task.spawn,
     isEdit = isEdit,
-    canLeave = function() return StudioTestService:CanLeaveTest() end,
-    leave = function() StudioTestService:LeaveTest() end,
     logError = function(message) warn("Regression Arena: Studio session API error.", message) end,
     execute = function(players, payload) return StudioTestService:ExecuteMultiplayerTestAsync(players, payload) end,
     encode = function(value) return HttpService:JSONEncode(value) end,
@@ -699,6 +703,7 @@ local function button(value, callback)
     item.BorderSizePixel = 0
     item.TextColor3 = palette.text
     item.TextSize = 13
+    item.TextWrapped = true
     item.Font = Enum.Font.GothamBold
     item.Text = value
     place(item, 30)
@@ -724,8 +729,8 @@ local function changeRunner(remove)
     end)
     notify(tostring(message):sub(1, 512), not ok)
 end
-button("Install / update owned test runner", function() changeRunner(false) end)
-button("Remove owned test runner", function() changeRunner(true) end)
+button("Install / repair runner", function() changeRunner(false) end)
+button("Remove owned runner", function() changeRunner(true) end)
 local playerOptions, playerIndex = { 1, 2, 4 }, 2
 local playerButton
 playerButton = button("Players: 2 (click to switch)", function()
@@ -747,10 +752,10 @@ for _, scenario in ipairs(Protocol.SCENARIOS) do
     timeout.ClearTextOnFocus = false
     timeout.Font = Enum.Font.Code
     timeout.TextSize = 12
-    timeout.Text = "20"
-    timeout.PlaceholderText = scenario .. " timeout seconds (5-60)"
+    timeout.Text = "60"
+    timeout.PlaceholderText = scenario .. " timeout seconds (5-180)"
     place(timeout, 26)
-    label(scenario .. " timeout in seconds (5-60, includes joining)", 18)
+    label(scenario .. " timeout in seconds (5-180, includes joining)", 18)
     entry.toggle, entry.input = toggle, timeout
     table.insert(cases, entry)
 end
@@ -779,7 +784,7 @@ end
 
 button("Save local preset", function()
     local plan = readPlan()
-    if not plan then notify("Select at least one case; use whole-number timeouts from 5 to 60.", true); return end
+    if not plan then notify("Select at least one case; use whole-number timeouts from 5 to 180.", true); return end
     local ok = saveSetting(PRESET_KEY, HttpService:JSONEncode(plan))
     notify(ok and "Preset saved on this computer." or "Could not save the local preset.", not ok)
 end)
@@ -822,7 +827,7 @@ end
 
 runButton = button("Run selected test plan", function()
     local plan = readPlan()
-    if not plan then notify("Select cases and enter whole-number timeouts from 5 to 60 seconds.", true); return end
+    if not plan then notify("Select cases and enter whole-number timeouts from 5 to 180 seconds.", true); return end
     if not session:ready() then notify("Previous test pending or Studio not in edit mode. Use Stop, then retry.", true); return end
     local ok, runner = pcall(function() return Manager.find(managerEnv, RUNNER_SOURCE) end)
     if not ok or not runner or not runner.Enabled or runner.RunContext ~= Enum.RunContext.Legacy then
@@ -879,13 +884,14 @@ stop.BackgroundColor3 = palette.card
 stop.TextColor3 = palette.text
 stop.TextSize = 13
 stop.Font = Enum.Font.GothamBold
-stop.Text = "Cancel / retry session cleanup"
+stop.TextWrapped = true
+stop.Text = "Cancel results (server finishes)"
 place(stop, 30)
 stop.MouseButton1Click:Connect(function()
     if disposed then return end
     stopRequested = true
     session:cancel()
-    notify("Cancellation requested. If Studio stays active, use its Stop button.", true)
+    notify("Results cancelled. Server ends at its deadline; use Studio Stop for immediate termination.", true)
 end)
 
 status = label("Install the runner, select cases, then run. Studio validation is still required.", 50)

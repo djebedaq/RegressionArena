@@ -3,11 +3,12 @@ local S = require("./Support")
 local function run(options)
     options = options or {}
     local request = S.request(options.scenario)
-    local state = { ends = 0, leaves = 0, delays = {}, services = {}, warnings = 0 }
+    local state = { ends = 0, leaves = 0, delays = {}, services = {}, warnings = 0, argsReads = 0 }
     local service = {}
     function service:GetTestArgs()
+        state.argsReads += 1
         if options.argsError then error("GetTestArgs denied") end
-        if options.noArgs then return nil end
+        if options.noArgs or (options.delayedArgs and state.argsReads < 3) then return nil end
         return "payload"
     end
     function service:EndTest(value)
@@ -15,8 +16,8 @@ local function run(options)
         if options.endError then error("EndTest denied") end
         state.result = value
     end
-    function service:CanLeaveTest() return true end
-    function service:LeaveTest() state.leaves += 1 end
+    function service:CanLeaveTest() error("Client-only API must not be called on server") end
+    function service:LeaveTest() state.leaves += 1; error("Client-only API must not be called on server") end
     function service:AddPlayers() error("AddPlayers denied") end
     local players = {}
     function players:GetPlayers()
@@ -68,7 +69,13 @@ S.test("client context returns before accessing test services",function()
 end)
 S.test("ordinary playtest with no args remains inert",function()
     local state=run({noArgs=true})
-    assert(state.ends==0 and #state.delays==0 and state.leaves==0)
+    assert(state.ends==0 and #state.delays==0 and state.leaves==0 and state.argsReads==3)
+end)
+S.test("nil startup handoff is retried only a bounded number of times",function()
+    local state=run({delayedArgs=true})
+    assert(state.argsReads==3 and state.ends==1 and state.result.passed)
+    assert(run({argsError=true}).argsReads==1)
+    assert(run({badMarker=true}).argsReads==1)
 end)
 S.test("argument API failure and malformed JSON remain inert",function()
     assert(run({argsError=true}).ends==0)
@@ -81,9 +88,9 @@ S.test("valid marked join reports proven success once",function()
     for _,callback in ipairs(state.delays) do callback() end
     assert(state.ends==1)
 end)
-S.test("EndTest failure requests cleanup without retrying PASS",function()
+S.test("EndTest failure warns without a client-only fallback or retrying PASS",function()
     local state=run({endError=true})
-    assert(state.ends==1 and state.leaves==1 and state.warnings==1)
+    assert(state.ends==1 and state.leaves==0 and state.warnings==1)
     for _,callback in ipairs(state.delays) do callback() end
     assert(state.ends==1)
 end)

@@ -8,8 +8,14 @@ local Players = game:GetService("Players")
 local Protocol = __PROTOCOL__
 local Core = __RUNNER_CORE__
 
--- No speculative polling in ordinary playtests. A missing marker means no action.
-local argsOK, raw = pcall(function() return StudioTestService:GetTestArgs() end)
+-- Studio 0.742 can time out the initial argument handoff under local startup load.
+-- Retry nil only, at most three reads. Unmarked tests still perform no test actions.
+local argsOK, raw
+for attempt = 1, 3 do
+    argsOK, raw = pcall(function() return StudioTestService:GetTestArgs() end)
+    if not argsOK or raw ~= nil then break end
+    if attempt < 3 then task.wait(1) end
+end
 if not argsOK or type(raw) ~= "string" or #raw > 2048 then return end
 local decoded, request = pcall(function() return HttpService:JSONDecode(raw) end)
 if not decoded or not Protocol.validRequest(request) then return end
@@ -33,11 +39,8 @@ local function finish(value)
         StudioTestService:EndTest(HttpService:JSONEncode(value))
     end)
     if not ok then
-        warn("Regression Arena: EndTest failed; plugin watchdog must stop this test.", err)
-        -- Never resend a PASS after an ambiguous EndTest failure.
-        pcall(function()
-            if StudioTestService:CanLeaveTest() then StudioTestService:LeaveTest() end
-        end)
+        warn("Regression Arena: EndTest failed. Use Studio Stop; LeaveTest is client-only.", err)
+        -- No supported server fallback. Never resend a PASS after an ambiguous failure.
     end
 end
 

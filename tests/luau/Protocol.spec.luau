@@ -24,9 +24,13 @@ test("plan rejects empty, duplicate, sparse and named cases", function()
     end
 end)
 test("plan rejects noninteger, out-of-range and nonfinite timeouts", function()
-    for _, timeout in ipairs({4,61,5.5,math.huge,0/0,"20"}) do
+    for _, timeout in ipairs({4,181,5.5,math.huge,0/0,"20"}) do
         assert(P.copyPlan({players=2,cases={{scenario="spawn",timeout=timeout}}}) == nil)
     end
+end)
+test("slow local client startup can use the bounded 180-second budget", function()
+    local plan = {players=4,cases={{scenario="latejoin",timeout=180}}}
+    assert(P.copyPlan(plan).cases[1].timeout == 180)
 end)
 test("request refuses wrong marker, unknown scenario, invalid count and missing nonce", function()
     local request = S.request()

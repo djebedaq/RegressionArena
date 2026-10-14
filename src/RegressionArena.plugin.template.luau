@@ -23,8 +23,6 @@ end
 local session = Session.new(Protocol, {
     now = os.clock, wait = task.wait, spawn = task.spawn,
     isEdit = isEdit,
-    canLeave = function() return StudioTestService:CanLeaveTest() end,
-    leave = function() StudioTestService:LeaveTest() end,
     logError = function(message) warn("Regression Arena: Studio session API error.", message) end,
     execute = function(players, payload) return StudioTestService:ExecuteMultiplayerTestAsync(players, payload) end,
     encode = function(value) return HttpService:JSONEncode(value) end,
@@ -94,6 +92,7 @@ local function button(value, callback)
     item.BorderSizePixel = 0
     item.TextColor3 = palette.text
     item.TextSize = 13
+    item.TextWrapped = true
     item.Font = Enum.Font.GothamBold
     item.Text = value
     place(item, 30)
@@ -119,8 +118,8 @@ local function changeRunner(remove)
     end)
     notify(tostring(message):sub(1, 512), not ok)
 end
-button("Install / update owned test runner", function() changeRunner(false) end)
-button("Remove owned test runner", function() changeRunner(true) end)
+button("Install / repair runner", function() changeRunner(false) end)
+button("Remove owned runner", function() changeRunner(true) end)
 local playerOptions, playerIndex = { 1, 2, 4 }, 2
 local playerButton
 playerButton = button("Players: 2 (click to switch)", function()
@@ -142,10 +141,10 @@ for _, scenario in ipairs(Protocol.SCENARIOS) do
     timeout.ClearTextOnFocus = false
     timeout.Font = Enum.Font.Code
     timeout.TextSize = 12
-    timeout.Text = "20"
-    timeout.PlaceholderText = scenario .. " timeout seconds (5-60)"
+    timeout.Text = "60"
+    timeout.PlaceholderText = scenario .. " timeout seconds (5-180)"
     place(timeout, 26)
-    label(scenario .. " timeout in seconds (5-60, includes joining)", 18)
+    label(scenario .. " timeout in seconds (5-180, includes joining)", 18)
     entry.toggle, entry.input = toggle, timeout
     table.insert(cases, entry)
 end
@@ -174,7 +173,7 @@ end
 
 button("Save local preset", function()
     local plan = readPlan()
-    if not plan then notify("Select at least one case; use whole-number timeouts from 5 to 60.", true); return end
+    if not plan then notify("Select at least one case; use whole-number timeouts from 5 to 180.", true); return end
     local ok = saveSetting(PRESET_KEY, HttpService:JSONEncode(plan))
     notify(ok and "Preset saved on this computer." or "Could not save the local preset.", not ok)
 end)
@@ -217,7 +216,7 @@ end
 
 runButton = button("Run selected test plan", function()
     local plan = readPlan()
-    if not plan then notify("Select cases and enter whole-number timeouts from 5 to 60 seconds.", true); return end
+    if not plan then notify("Select cases and enter whole-number timeouts from 5 to 180 seconds.", true); return end
     if not session:ready() then notify("Previous test pending or Studio not in edit mode. Use Stop, then retry.", true); return end
     local ok, runner = pcall(function() return Manager.find(managerEnv, RUNNER_SOURCE) end)
     if not ok or not runner or not runner.Enabled or runner.RunContext ~= Enum.RunContext.Legacy then
@@ -274,13 +273,14 @@ stop.BackgroundColor3 = palette.card
 stop.TextColor3 = palette.text
 stop.TextSize = 13
 stop.Font = Enum.Font.GothamBold
-stop.Text = "Cancel / retry session cleanup"
+stop.TextWrapped = true
+stop.Text = "Cancel results (server finishes)"
 place(stop, 30)
 stop.MouseButton1Click:Connect(function()
     if disposed then return end
     stopRequested = true
     session:cancel()
-    notify("Cancellation requested. If Studio stays active, use its Stop button.", true)
+    notify("Results cancelled. Server ends at its deadline; use Studio Stop for immediate termination.", true)
 end)
 
 status = label("Install the runner, select cases, then run. Studio validation is still required.", 50)

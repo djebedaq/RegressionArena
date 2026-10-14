@@ -24,6 +24,12 @@ class IntegrityChecks(unittest.TestCase):
         writes = [line.strip() for line in source.splitlines() if ".Source =" in line]
         self.assertEqual(writes, ["candidate.Source = source"])
 
+    def test_cleanup_never_calls_client_only_leave_or_persists_simulation(self):
+        source = "\n".join(path.read_text(encoding="utf-8") for path in (ROOT / "src").glob("*.luau"))
+        for forbidden in (":CanLeaveTest(", ":LeaveTest(", "RunService:Stop("):
+            with self.subTest(forbidden=forbidden):
+                self.assertNotIn(forbidden, source)
+
     def test_ci_requires_build_clean_generated_diff_and_luau(self):
         workflow = (ROOT / ".github/workflows/python-checks.yml").read_text(encoding="utf-8")
         for required in ("python scripts_build.py", "python -m unittest discover -s tests -v",

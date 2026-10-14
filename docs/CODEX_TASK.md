@@ -1,6 +1,6 @@
 # Codex Task RA-001 — ship a trustworthy v0.2 prototype
 
-**Status:** RA-001 implementation prepared for review; offline evidence is in `RA-001_VERIFICATION.md`. Studio acceptance B–G remains UNVERIFIED. Do not claim runtime success without a Studio run.
+**Status:** RA-001 is under review with actual Studio 0.742 evidence in `RA-001_VERIFICATION.md` and `studio-evidence/README.md`. The gate has NOT passed: 1-player suites pass, all three 2-player cases have positive evidence across separate runs, but 4-player tests fail. Disabled spawning, Cancel recovery and ownership/Undo checks have engine evidence; remaining subcases are explicitly UNVERIFIED in `STUDIO_VALIDATION.md`. Do not call this production-ready or implement the paid layer.
 
 ## Objective
 

@@ -1,17 +1,17 @@
 # Regression Arena — v0.2 prototype
 
-**Status: RA-001 implementation; Roblox Studio runtime validation remains UNVERIFIED. Not production-ready or approved for sale.**
+**Status: RA-001 implementation with real Roblox Studio evidence. Validation is incomplete; see the recorded PASS/FAIL/UNVERIFIED matrix. Not production-ready or approved for sale.**
 
-Regression Arena runs repeatable multiplayer smoke checks in a local Roblox Studio place copy. Select `join`, `spawn`, and `latejoin` independently, choose 1/2/4 initial players, and give each case a whole-number timeout of 5–60 seconds (default 20). Each case starts its own multiplayer session. Latejoin requests one additional player after the initial group joins.
+Regression Arena runs repeatable multiplayer smoke checks in a local Roblox Studio place copy. Select `join`, `spawn`, and `latejoin` independently, choose 1/2/4 initial players, and give each case a whole-number timeout of 5–180 seconds (default 60). Each case starts its own multiplayer session. Latejoin requests one additional player after the initial group joins. Slower machines can need a larger budget for local client startup.
 
 A PASS requires a matching run identifier, strict result schema, and scenario evidence. Reports include expected/observed behavior, elapsed seconds, counts, and a suggested next check. A timed-out, cancelled, malformed, or stale result cannot become PASS. Infrastructure failure aborts the remaining cases with explicit “not run” failures.
 
 ## Install and run locally
 
 1. Open a **disposable, local copy** of a simple place. Game scripts still execute during tests; keep production credentials, live data access, purchases, and external integrations out of this copy. Regression Arena does not intercept game code or sandbox its side effects.
-2. Enable **Plugin Debugging Enabled** in Studio settings. Insert a temporary `Script` named `RegressionArena` under `ServerStorage`; paste `dist/RegressionArena.plugin.luau` into its Source.
+2. Insert a temporary `Script` named `RegressionArena` under `ServerStorage`; paste `dist/RegressionArena.plugin.luau` into its Source. Local installation was verified in Studio 0.742 without changing security settings.
 3. Select it and use **Plugins → Save as Local Plugin**. Delete the temporary Script. Open Regression Arena using its toolbar button.
-4. In edit mode, click **Install / update owned test runner**. The sole place asset created is `ServerScriptService.RegressionArena_TestRunner`, with `RAOwner=RegressionArena`, `RAVersion=0.2.0`, and server Legacy run context. Installation/removal use undo recordings.
+4. In edit mode, click **Install / repair runner**. The sole place asset created is `ServerScriptService.RegressionArena_TestRunner`, with `RAOwner=RegressionArena`, `RAVersion=0.2.0`, and server Legacy run context. Installation/removal use undo recordings.
 5. Select the player count, toggle cases, and enter the timeout under each case. Click **Run selected test plan**. The vertically scrolling panel remains usable in a small dock.
 6. Inspect the counts and diagnosis. Click Results and use Ctrl+A / Ctrl+C to copy text and JSON. **Show last saved report** is explicitly labeled as a previous run.
 7. **Save local preset** / **Load local preset** retain one plan in plugin settings, without adding game assets. History retains at most ten reports, each at most 8 KiB. The preset is at most 2 KiB when loaded. Writes are checked by immediate readback; settings errors do not turn a failed test into success.
@@ -21,10 +21,11 @@ A PASS requires a matching run identifier, strict result schema, and scenario ev
 - Repeating Install is idempotent. For an unchanged v0.2 runner, it also repairs a disabled script or incorrect run context.
 - A matching name alone is never ownership. Duplicate names, missing ownership/version attributes, unsupported versions, changed Source, unsaved editor changes, and child content all block running/updating/removing that runner.
 - **v0.1 migration:** its untagged runner is deliberately not adopted. In your disposable place, inspect and preserve it yourself, then rename it out of the reserved name or manually remove it only after confirming it contains no work to keep. Install v0.2 afterward.
-- Before loading a future plugin build with different runner source, use the **old build's Remove owned test runner** first. Then reload the local plugin and install the new runner. There is no automatic overwrite of unknown or modified runner content.
-- **Remove owned test runner** detaches only the exact owned, unmodified runner in edit mode. Undo restores it. Other scripts and player data are not touched by the plugin.
-- **Cancel / retry session cleanup** requests cancellation for the plugin's pending session. The plugin watchdog allows the case timeout plus 30 seconds for launch/transport, then up to 5 seconds for cleanup; a completed call may also need up to 5 seconds for edit mode to settle.
-- The UI recovers to a failure report, but another native test remains blocked until the outstanding call actually returns **and** edit mode is confirmed. If Studio ignores cancellation, use Studio's Stop button. If the engine remains hung, reopen the disposable place. Closing the panel merely hides it; unloading the plugin requests cancellation.
+- Before loading a future plugin build with different runner source, use the **old build's Remove owned runner** first. Then reload the local plugin and install the new runner. There is no automatic overwrite of unknown or modified runner content.
+- **Remove owned runner** detaches only the exact owned, unmodified runner in edit mode. Undo restores it. Other scripts and player data are not touched by the plugin.
+- **Cancel results (server finishes)** discards the pending result and skips remaining cases. The server still ends through EndTest or its scenario deadline. For immediate termination, use Studio **Stop / End Session**. Roblox's LeaveTest methods are client-only and cannot stop the whole session from a plugin.
+- The plugin watchdog allows the case timeout plus 30 seconds for launch/transport, then up to 10 seconds to observe recovery. Native ownership is released only after Execute returns and edit mode stays true for 3 seconds, preventing a delayed previous Stop action from interrupting the next case. These are cooperative Lua deadlines; engine stalls can exceed them, and actual elapsed time is preserved.
+- Another native test remains blocked while its previous call is outstanding. Missing arguments or a failed EndTest can require Studio Stop; reopen the disposable place if Studio remains hung. Closing the panel merely hides it; unloading discards pending results and does not pretend to terminate the engine session.
 - Outside Studio, the runner returns before accessing test services. In Studio it also requires server context and valid v0.2 test arguments. Ordinary unmarked playtests receive no scenario execution, player additions, or EndTest calls.
 - The installed Script is included if you save/publish the place with it present. Remove it before shipping your game. This task does not publish anything.
 
@@ -39,7 +40,7 @@ python -m unittest discover -s tests -v
 
 Python uses only the standard library. For Luau mock execution and syntax compilation, install the official [Luau CLI 0.742](https://github.com/luau-lang/luau/releases/tag/0.742), put the tools on PATH, or set `LUAU_BIN` and `LUAU_COMPILE_BIN`. A local `.tools/luau/` installation is also detected and ignored by Git. Without tools, those tests explicitly report SKIPPED; build/integrity checks still run. CI installs the pinned official Linux release with a SHA-256 check and requires all tests, plus an unchanged rebuilt distribution.
 
-The Luau tests execute the actual protocol, scenario, session, installation and history modules against mocks, including the generated server boundary. **They do not execute Roblox Studio, validate API permissions, or demonstrate real multiplayer success.** See [offline verification](docs/RA-001_VERIFICATION.md), [API audit](docs/API_AUDIT.md), and the exact [Studio validation procedure](docs/STUDIO_VALIDATION.md).
+The Luau tests execute the actual protocol, scenario, session, installation and history modules against mocks, including the generated server boundary. **They do not execute Roblox Studio, validate API permissions, or demonstrate real multiplayer success.** See the [verification record](docs/RA-001_VERIFICATION.md), [actual Studio evidence](docs/studio-evidence/README.md), [API audit](docs/API_AUDIT.md), and exact [Studio validation procedure](docs/STUDIO_VALIDATION.md).
 
 No network requests, telemetry, accounts, AI API, subscriptions, licensing or payment layer are implemented. HttpService is used only for local JSON encoding/decoding and random run identifiers. Reports contain counts and predefined diagnoses, not game source, player names, or user IDs. Only the owned runner source is inspected for integrity.
 
