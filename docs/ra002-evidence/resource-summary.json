@@ -1,0 +1,68 @@
+{
+  "baseline": {
+    "samples": 22,
+    "firstUTC": "2026-10-14T04:03:20.1564841Z",
+    "lastUTC": "2026-10-14T04:05:30.3544058Z",
+    "AvailableRAMMiB": {
+      "min": 143.0,
+      "max": 620.0
+    },
+    "SystemCPUPercent": {
+      "min": 17.0,
+      "max": 67.0
+    },
+    "StudioProcesses": {
+      "min": 1.0,
+      "max": 1.0
+    },
+    "StudioWorkingSetMiB": {
+      "min": 487.0,
+      "max": 517.0
+    },
+    "StudioPrivateCommitMiB": {
+      "min": 2102.0,
+      "max": 2110.0
+    },
+    "StudioCPUPercent": {
+      "min": 5.4,
+      "max": 10.8
+    },
+    "UnresponsiveStudioProcesses": {
+      "min": 0.0,
+      "max": 0.0
+    }
+  },
+  "native-4": {
+    "samples": 31,
+    "firstUTC": "2026-10-14T04:05:36.5232163Z",
+    "lastUTC": "2026-10-14T04:14:25.1596885Z",
+    "AvailableRAMMiB": {
+      "min": 60.0,
+      "max": 1109.0
+    },
+    "SystemCPUPercent": {
+      "min": 8.0,
+      "max": 93.0
+    },
+    "StudioProcesses": {
+      "min": 1.0,
+      "max": 6.0
+    },
+    "StudioWorkingSetMiB": {
+      "min": 501.0,
+      "max": 2591.0
+    },
+    "StudioPrivateCommitMiB": {
+      "min": 2108.0,
+      "max": 9996.0
+    },
+    "StudioCPUPercent": {
+      "min": 0.0,
+      "max": 104.4
+    },
+    "UnresponsiveStudioProcesses": {
+      "min": 0.0,
+      "max": 6.0
+    }
+  }
+}

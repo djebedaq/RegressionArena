@@ -1,0 +1,218 @@
+Selected actual recovery Output and lifecycle events; raw logs and identities excluded.
+2026-10-14T07:46:07.960Z RA002_RECOVERY place 0 edit true running false sss 1
+2026-10-14T07:49:00.973Z RA002_RECOVERY native fixture ready; baseline preserved true runner absent true
+2026-10-14T07:50:54.303Z RA002_NATIVE expected 2 players 0 ready 0 serverElapsed 0
+2026-10-14T07:50:54.303Z RA002_NATIVE observer started; no RA runner true
+2026-10-14T07:51:26.655Z RA002_NATIVE expected 2 players 1 ready 0 serverElapsed 32.35
+2026-10-14T07:51:37.438Z RA002_NATIVE expected 2 players 2 ready 2 serverElapsed 43.13
+2026-10-14T07:57:21.801Z RA002_NATIVE observation window ended; session left active
+2026-10-14T08:50:20.250Z RA002_RECOVERY baseline restored true enabled true sss 1 edit true
+2026-10-14T08:56:43.839Z Handling request to start test
+2026-10-14T08:56:43.858Z Creating ServerAndClientsTestExecutor
+2026-10-14T08:56:53.458Z Creating ServerAndClientsTestExecutor
+2026-10-14T08:57:43.376Z Creating ServerAndClientsTestExecutor
+2026-10-14T08:57:44.370Z Sending test result to [process]
+2026-10-14T08:57:44.628Z About to trigger action to cleanup Server and Clients
+2026-10-14T08:57:45.134Z Broadcast action triggerd end test to 2 instances
+2026-10-14T08:57:46.385Z Handling test has ended
+2026-10-14T08:57:53.821Z Creating ServerAndClientsTestExecutor
+2026-10-14T08:57:53.821Z Handling request to start test
+2026-10-14T08:58:07.543Z Creating ServerAndClientsTestExecutor
+2026-10-14T08:58:52.076Z Creating ServerAndClientsTestExecutor
+2026-10-14T08:58:58.542Z Sending test result to [process]
+2026-10-14T08:58:59.713Z About to trigger action to cleanup Server and Clients
+2026-10-14T08:59:00.260Z Broadcast action triggerd end test to 3 instances
+2026-10-14T08:59:00.303Z Handling test has ended
+2026-10-14T08:59:05.840Z Handling request to start test
+2026-10-14T08:59:05.966Z Creating ServerAndClientsTestExecutor
+2026-10-14T08:59:28.977Z Creating ServerAndClientsTestExecutor
+2026-10-14T08:59:39.728Z Creating ServerAndClientsTestExecutor
+2026-10-14T09:02:31.491Z Sending test result to [process]
+2026-10-14T09:02:31.492Z About to trigger action to cleanup Server and Clients
+2026-10-14T09:02:32.389Z Broadcast action triggerd end test to 4 instances
+2026-10-14T09:02:32.648Z Handling test has ended
+2026-10-14T09:06:03.244Z Handling request to start test
+2026-10-14T09:06:03.247Z Creating ServerAndClientsTestExecutor
+2026-10-14T09:06:09.347Z Creating ServerAndClientsTestExecutor
+2026-10-14T09:06:32.734Z Creating ServerAndClientsTestExecutor
+2026-10-14T09:06:35.192Z Sending test result to [process]
+2026-10-14T09:06:35.193Z About to trigger action to cleanup Server and Clients
+2026-10-14T09:06:35.262Z Broadcast action triggerd end test to 2 instances
+2026-10-14T09:06:37.712Z Handling test has ended
+2026-10-14T09:06:41.228Z Creating ServerAndClientsTestExecutor
+2026-10-14T09:06:41.228Z Handling request to start test
+2026-10-14T09:06:42.238Z Handling test has ended
+2026-10-14T09:06:47.226Z Regression Arena: Studio session API error. Unexpected EndTest transport type: nil
+2026-10-14T09:06:50.054Z Creating ServerAndClientsTestExecutor
+2026-10-14T09:06:54.114Z Arg not received due to timeout
+2026-10-14T09:07:04.993Z Creating ServerAndClientsTestExecutor
+2026-10-14T09:10:53.409Z Broadcast action triggerd end test to 2 instances
+2026-10-14T09:13:02.780Z RA002_PLUGIN candidates 0
+2026-10-14T09:14:09.652Z RA002_UPDATE staging source bytes 40779 runner preserved true
+2026-10-14T09:15:49.970Z RA002_UPDATE staging detached 0 runner unchanged true
+2026-10-14T09:16:26.869Z Handling request to start test
+2026-10-14T09:16:26.873Z Creating ServerAndClientsTestExecutor
+2026-10-14T09:16:34.686Z Creating ServerAndClientsTestExecutor
+2026-10-14T09:16:59.900Z Creating ServerAndClientsTestExecutor
+2026-10-14T09:17:01.749Z Sending test result to [process]
+2026-10-14T09:17:01.751Z About to trigger action to cleanup Server and Clients
+2026-10-14T09:17:03.207Z Broadcast action triggerd end test to 2 instances
+2026-10-14T09:17:04.267Z Handling test has ended
+2026-10-14T09:17:17.085Z Creating ServerAndClientsTestExecutor
+2026-10-14T09:17:17.085Z Handling request to start test
+2026-10-14T09:17:23.182Z Creating ServerAndClientsTestExecutor
+2026-10-14T09:17:32.720Z Creating ServerAndClientsTestExecutor
+2026-10-14T09:17:35.746Z Sending test result to [process]
+2026-10-14T09:17:35.749Z About to trigger action to cleanup Server and Clients
+2026-10-14T09:17:35.808Z Broadcast action triggerd end test to 2 instances
+2026-10-14T09:17:37.570Z Handling test has ended
+2026-10-14T09:17:47.728Z Creating ServerAndClientsTestExecutor
+2026-10-14T09:17:47.728Z Handling request to start test
+2026-10-14T09:17:53.459Z Creating ServerAndClientsTestExecutor
+2026-10-14T09:17:57.494Z Arg not received due to timeout
+2026-10-14T09:18:14.925Z Creating ServerAndClientsTestExecutor
+2026-10-14T09:22:38.208Z RA002_ARGS callOK true type nil length -1 players 1 isServer true
+2026-10-14T09:23:00.173Z Broadcast action triggerd end test to 2 instances
+2026-10-14T09:23:02.520Z EndTestFromAction event received
+2026-10-14T09:23:02.548Z Handling test has ended
+2026-10-14T09:23:02.548Z Received request to end test from action trigger
+2026-10-14T09:24:29.860Z Handling request to start test
+2026-10-14T09:24:29.864Z Creating ServerAndClientsTestExecutor
+2026-10-14T09:24:38.125Z Creating ServerAndClientsTestExecutor
+2026-10-14T09:24:59.912Z Creating ServerAndClientsTestExecutor
+2026-10-14T09:25:01.455Z About to trigger action to cleanup Server and Clients
+2026-10-14T09:25:01.455Z Sending test result to [process]
+2026-10-14T09:25:03.981Z Handling test has ended
+2026-10-14T09:25:04.738Z Broadcast action triggerd end test to 2 instances
+2026-10-14T09:25:14.753Z Handling request to start test
+2026-10-14T09:25:14.754Z Creating ServerAndClientsTestExecutor
+2026-10-14T09:25:19.775Z Creating ServerAndClientsTestExecutor
+2026-10-14T09:25:31.089Z Creating ServerAndClientsTestExecutor
+2026-10-14T09:25:34.006Z Sending test result to [process]
+2026-10-14T09:25:34.009Z About to trigger action to cleanup Server and Clients
+2026-10-14T09:25:34.066Z Broadcast action triggerd end test to 2 instances
+2026-10-14T09:25:36.607Z Handling test has ended
+2026-10-14T09:25:47.077Z Creating ServerAndClientsTestExecutor
+2026-10-14T09:25:47.077Z Handling request to start test
+2026-10-14T09:25:52.174Z Creating ServerAndClientsTestExecutor
+2026-10-14T09:26:04.956Z Creating ServerAndClientsTestExecutor
+2026-10-14T09:26:39.310Z Creating ServerAndClientsTestExecutor
+2026-10-14T09:26:44.305Z Sending test result to [process]
+2026-10-14T09:26:44.309Z About to trigger action to cleanup Server and Clients
+2026-10-14T09:26:44.781Z Broadcast action triggerd end test to 3 instances
+2026-10-14T09:26:46.744Z Handling test has ended
+2026-10-14T09:30:09.343Z Handling request to start test
+2026-10-14T09:30:09.347Z Creating ServerAndClientsTestExecutor
+2026-10-14T09:30:21.634Z Creating ServerAndClientsTestExecutor
+2026-10-14T09:30:44.087Z Creating ServerAndClientsTestExecutor
+2026-10-14T09:30:46.970Z Sending test result to [process]
+2026-10-14T09:30:47.109Z About to trigger action to cleanup Server and Clients
+2026-10-14T09:30:49.117Z Handling test has ended
+2026-10-14T09:30:49.281Z Broadcast action triggerd end test to 2 instances
+2026-10-14T09:31:00.674Z Creating ServerAndClientsTestExecutor
+2026-10-14T09:31:00.674Z Handling request to start test
+2026-10-14T09:31:06.466Z Creating ServerAndClientsTestExecutor
+2026-10-14T09:31:19.037Z Creating ServerAndClientsTestExecutor
+2026-10-14T09:31:21.493Z Sending test result to [process]
+2026-10-14T09:31:21.495Z About to trigger action to cleanup Server and Clients
+2026-10-14T09:31:22.125Z Broadcast action triggerd end test to 2 instances
+2026-10-14T09:31:23.560Z Handling test has ended
+2026-10-14T09:31:34.470Z Creating ServerAndClientsTestExecutor
+2026-10-14T09:31:34.470Z Handling request to start test
+2026-10-14T09:31:46.422Z Creating ServerAndClientsTestExecutor
+2026-10-14T09:31:58.939Z Creating ServerAndClientsTestExecutor
+2026-10-14T09:32:41.845Z Creating ServerAndClientsTestExecutor
+2026-10-14T09:32:55.207Z Sending test result to [process]
+2026-10-14T09:32:55.438Z About to trigger action to cleanup Server and Clients
+2026-10-14T09:32:57.352Z Handling test has ended
+2026-10-14T09:33:01.077Z Broadcast action triggerd end test to 3 instances
+2026-10-14T09:39:03.174Z Handling request to start test
+2026-10-14T09:39:03.178Z Creating ServerAndClientsTestExecutor
+2026-10-14T09:39:09.382Z Creating ServerAndClientsTestExecutor
+2026-10-14T09:39:28.379Z Creating ServerAndClientsTestExecutor
+2026-10-14T09:39:29.572Z Sending test result to [process]
+2026-10-14T09:39:29.573Z About to trigger action to cleanup Server and Clients
+2026-10-14T09:39:29.873Z Broadcast action triggerd end test to 2 instances
+2026-10-14T09:39:32.278Z Handling test has ended
+2026-10-14T09:39:42.679Z Handling request to start test
+2026-10-14T09:39:42.682Z Creating ServerAndClientsTestExecutor
+2026-10-14T09:39:47.758Z Creating ServerAndClientsTestExecutor
+2026-10-14T09:39:59.035Z Creating ServerAndClientsTestExecutor
+2026-10-14T09:40:01.546Z Sending test result to [process]
+2026-10-14T09:40:01.547Z About to trigger action to cleanup Server and Clients
+2026-10-14T09:40:01.595Z Broadcast action triggerd end test to 2 instances
+2026-10-14T09:40:03.895Z Handling test has ended
+2026-10-14T09:40:15.255Z Handling request to start test
+2026-10-14T09:40:15.337Z Creating ServerAndClientsTestExecutor
+2026-10-14T09:40:16.440Z Handling test has ended
+2026-10-14T09:40:22.327Z Creating ServerAndClientsTestExecutor
+2026-10-14T09:40:26.549Z Arg not received due to timeout
+2026-10-14T09:40:26.855Z Regression Arena: Studio session API error. Unexpected EndTest transport type: nil
+2026-10-14T09:40:38.314Z Creating ServerAndClientsTestExecutor
+2026-10-14T09:46:19.822Z Broadcast action triggerd end test to 2 instances
+2026-10-14T09:47:52.959Z RA002_UPDATE staging source bytes 41322 runner preserved true
+2026-10-14T09:50:07.745Z RA002_UPDATE final staging detached 0 runner unchanged true
+2026-10-14T09:51:10.250Z RA002_VERIFY place 0 edit true running false stageExists true stageParent nil stageName RegressionArena_RA002_Install stageChildren 0 storageCount 0 runnerCount 1
+2026-10-14T09:52:02.233Z Handling request to start test
+2026-10-14T09:52:02.237Z Creating ServerAndClientsTestExecutor
+2026-10-14T09:52:16.319Z Creating ServerAndClientsTestExecutor
+2026-10-14T09:52:34.202Z Creating ServerAndClientsTestExecutor
+2026-10-14T09:52:39.156Z Creating ServerAndClientsTestExecutor
+2026-10-14T09:52:44.800Z Sending test result to [process]
+2026-10-14T09:52:44.816Z About to trigger action to cleanup Server and Clients
+2026-10-14T09:52:45.143Z Broadcast action triggerd end test to 3 instances
+2026-10-14T09:52:46.541Z Handling test has ended
+2026-10-14T09:55:21.878Z Handling request to start test
+2026-10-14T09:55:21.884Z Creating ServerAndClientsTestExecutor
+2026-10-14T09:55:27.818Z Creating ServerAndClientsTestExecutor
+2026-10-14T09:55:44.412Z Creating ServerAndClientsTestExecutor
+2026-10-14T09:55:55.686Z Creating ServerAndClientsTestExecutor
+2026-10-14T09:55:58.427Z Sending test result to [process]
+2026-10-14T09:55:58.429Z About to trigger action to cleanup Server and Clients
+2026-10-14T09:55:58.652Z Broadcast action triggerd end test to 3 instances
+2026-10-14T09:56:01.046Z Handling test has ended
+2026-10-14T09:58:19.239Z RA002_FAULT nil fixture installed; baseline preserved true
+2026-10-14T09:58:31.546Z Handling request to start test
+2026-10-14T09:58:31.550Z Creating ServerAndClientsTestExecutor
+2026-10-14T09:58:36.087Z Creating ServerAndClientsTestExecutor
+2026-10-14T09:58:40.070Z RA002_FAULT deliberately nil EndTest transport
+2026-10-14T09:58:49.278Z Creating ServerAndClientsTestExecutor
+2026-10-14T09:58:50.388Z Sending test result to [process]
+2026-10-14T09:58:50.431Z About to trigger action to cleanup Server and Clients
+2026-10-14T09:58:50.685Z Broadcast action triggerd end test to 2 instances
+2026-10-14T09:58:52.553Z Handling test has ended
+2026-10-14T10:00:51.199Z RA002_FAULT isolated fixture updated; edit runner enabled true
+2026-10-14T10:01:02.432Z Handling request to start test
+2026-10-14T10:01:02.434Z Creating ServerAndClientsTestExecutor
+2026-10-14T10:01:08.627Z Creating ServerAndClientsTestExecutor
+2026-10-14T10:01:11.662Z RA002_FAULT owned server runner clone disabled
+2026-10-14T10:01:11.663Z RA002_FAULT deliberately nil EndTest transport
+2026-10-14T10:01:20.208Z Creating ServerAndClientsTestExecutor
+2026-10-14T10:06:27.180Z Broadcast action triggerd end test to 2 instances
+2026-10-14T10:06:28.828Z EndTestFromAction event received
+2026-10-14T10:06:28.828Z Handling test has ended
+2026-10-14T10:06:28.828Z Received request to end test from action trigger
+2026-10-14T10:08:41.051Z RA002_FAULT table fixture prepared; edit runner enabled true
+2026-10-14T10:10:08.470Z Handling request to start test
+2026-10-14T10:10:08.474Z Creating ServerAndClientsTestExecutor
+2026-10-14T10:10:14.504Z Creating ServerAndClientsTestExecutor
+2026-10-14T10:10:17.709Z RA002_FAULT deliberately table EndTest transport
+2026-10-14T10:10:17.709Z RA002_FAULT owned server runner clone disabled
+2026-10-14T10:10:17.755Z Sending test result to [process]
+2026-10-14T10:10:17.839Z About to trigger action to cleanup Server and Clients
+2026-10-14T10:10:17.881Z Broadcast action triggerd end test to 2 instances
+2026-10-14T10:10:19.907Z Handling test has ended
+2026-10-14T10:10:30.007Z Regression Arena: Studio session API error. Unexpected EndTest transport type: table
+2026-10-14T10:16:54.423Z RA002_UPDATE final UI build staged; fixture detached; baseline preserved true
+2026-10-14T10:20:49.496Z RA002_UPDATE UI build ready; temporary table fixture attached; edit runner enabled true
+2026-10-14T10:22:38.781Z Handling request to start test
+2026-10-14T10:22:38.784Z Creating ServerAndClientsTestExecutor
+2026-10-14T10:22:45.398Z Creating ServerAndClientsTestExecutor
+2026-10-14T10:22:48.967Z RA002_FAULT deliberately table EndTest transport
+2026-10-14T10:22:48.967Z RA002_FAULT owned server runner clone disabled
+2026-10-14T10:22:48.968Z Sending test result to [process]
+2026-10-14T10:22:49.069Z About to trigger action to cleanup Server and Clients
+2026-10-14T10:22:49.225Z Broadcast action triggerd end test to 2 instances
+2026-10-14T10:22:50.853Z Handling test has ended
+2026-10-14T10:23:00.945Z Regression Arena: Studio session API error. Unexpected EndTest transport type: table
+2026-10-14T10:27:50.918Z RA002_FINAL place 0 edit true running false sss 1 storage 0 runnerEnabled true runnerSourceUnchanged true faultDetached true

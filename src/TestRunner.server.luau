@@ -1,123 +1,87 @@
--- Regression Arena v0.1 test runner.
--- Installed into ServerScriptService by the Studio plugin.
--- Runs ONLY when a Regression Arena StudioTestService session passes a valid marker.
+-- Regression Arena runner 1.0.0. Only an explicitly marked Studio server test may act.
 local RunService = game:GetService("RunService")
-if not RunService:IsStudio() then
-    return
-end
+if not RunService:IsStudio() or not RunService:IsServer() then return end
 
 local StudioTestService = game:GetService("StudioTestService")
-local Players = game:GetService("Players")
 local HttpService = game:GetService("HttpService")
+local Players = game:GetService("Players")
+local Protocol = __PROTOCOL__
+local Core = __RUNNER_CORE__
+local Snapshot = __SNAPSHOT__
+local Reader = __INSTANCE_READER__
 
--- The Roblox API occasionally returns nil immediately after entering test mode.
-local arguments = nil
-for _ = 1, 35 do
-    arguments = StudioTestService:GetTestArgs()
-    if arguments ~= nil then
-        break
-    end
-    task.wait(0.1)
+-- Studio 0.742 can time out the initial argument handoff under local startup load.
+-- Retry nil only, at most three reads. Unmarked tests still perform no test actions.
+local argsOK, raw
+for attempt = 1, 3 do
+    argsOK, raw = pcall(function() return StudioTestService:GetTestArgs() end)
+    if not argsOK or raw ~= nil then break end
+    if attempt < 3 then task.wait(1) end
 end
+if not argsOK or type(raw) ~= "string" or #raw > Snapshot.MAX_REQUEST_BYTES then return end
+local decoded, request = pcall(function() return HttpService:JSONDecode(raw) end)
+if not decoded or type(request) ~= "table" then return end
+local contract = request.marker == Snapshot.MARKER and Snapshot or Protocol
+if not contract.validRequest(request) then return end
 
-if type(arguments) ~= "string" then
-    return -- Do not interfere with unrelated playtests.
-end
-
-local scenario, declaredPlayers = string.match(arguments, "^RA01:([%a]+):([1-8])$")
-if not scenario then
-    return
-end
-
-local expectedPlayers = tonumber(declaredPlayers)
+local started = os.clock()
 local finalized = false
-local startTime = os.clock()
-
-local function endSession(passed, description)
-    if finalized then
-        return
+local function snapshot()
+    local players = Players:GetPlayers()
+    local identities, ready = {}, 0
+    for _, player in ipairs(players) do
+        identities[player] = true -- In-memory identity only; never put in the result.
+        local character = player.Character
+        if character and character.Parent and character:FindFirstChildOfClass("Humanoid") then ready += 1 end
     end
+    return { count = #players, ready = ready, identities = identities }
+end
+local function finish(value)
+    if finalized then return end
     finalized = true
-    local result = {
-        marker = "RegressionArenaV01",
-        scenario = scenario,
-        passed = passed == true,
-        details = tostring(description),
-        elapsed = math.floor((os.clock() - startTime) * 100) / 100,
-    }
-    StudioTestService:EndTest(HttpService:JSONEncode(result))
-end
-
-task.delay(40, function()
-    endSession(false, "Timeout: scenario did not finish in 40 seconds.")
-end)
-
-local function waitUntil(predicate, seconds)
-    local limit = os.clock() + seconds
-    repeat
-        if predicate() then
-            return true
-        end
-        task.wait(0.15)
-    until os.clock() >= limit
-    return predicate()
-end
-
--- Keep the test runner independent of the game's own remotes or dependencies.
-task.spawn(function()
     local ok, err = pcall(function()
-        local joined = waitUntil(function()
-            return #Players:GetPlayers() >= expectedPlayers
-        end, 18)
-        if not joined then
-            endSession(false, "Expected " .. expectedPlayers .. " players, got " .. #Players:GetPlayers())
-            return
-        end
-
-        if scenario == "join" then
-            endSession(true, "Joined " .. #Players:GetPlayers() .. " / " .. expectedPlayers .. " players.")
-            return
-        end
-
-        if scenario == "spawn" then
-            local ready = waitUntil(function()
-                for _, player in Players:GetPlayers() do
-                    local character = player.Character
-                    if not character or not character:FindFirstChildOfClass("Humanoid") then
-                        return false
-                    end
-                end
-                return true
-            end, 16)
-            if ready then
-                endSession(true, "All " .. expectedPlayers .. " players spawned with Humanoids.")
-            else
-                endSession(false, "One or more players did not spawn a character with a Humanoid.")
-            end
-            return
-        end
-
-        if scenario == "latejoin" then
-            if expectedPlayers >= 8 then
-                endSession(false, "Late join needs fewer than 8 initial players.")
-                return
-            end
-            local existing = #Players:GetPlayers()
-            StudioTestService:AddPlayers(1)
-            local added = waitUntil(function()
-                return #Players:GetPlayers() >= existing + 1
-            end, 18)
-            if added then
-                endSession(true, "Late join succeeded: " .. existing .. " to " .. #Players:GetPlayers() .. " players.")
-            else
-                endSession(false, "Late join failed: expected " .. (existing + 1) .. " players.")
-            end
-            return
-        end
-
-        endSession(false, "Unknown scenario: " .. scenario)
+        StudioTestService:EndTest(HttpService:JSONEncode(value))
     end)
     if not ok then
-        endSession(false, "Runtime error: " .. tostring(err))
+        warn("Regression Arena: EndTest failed. Use Studio Stop; LeaveTest is client-only.", err)
+        -- No supported server fallback. Never resend a PASS after an ambiguous failure.
     end
+end
+
+task.delay(request.timeout, function()
+    if finalized then return end
+    local value = contract.failure(request, "Server scenario deadline exceeded", os.clock() - started,
+        (contract == Snapshot or request.scenario == "spawn") and "Check Players.CharacterAutoLoads, custom character loaders, configured paths and server Output."
+            or "Check initial joining, AddPlayers for latejoin, and server Output for blocked API calls.")
+    local measured, view = pcall(snapshot)
+    if measured and contract == Protocol then
+        value.observed = string.format("Server deadline exceeded: %d players; %d characters with Humanoids", view.count, view.ready)
+        value.evidence.finalCount = view.count
+        value.evidence.readyCount = view.ready
+    elseif measured then
+        value.serverCount, value.readyCount = view.count, view.ready
+        value.observed = string.format("Snapshot deadline exceeded: %d players; %d characters with Humanoids", view.count, view.ready)
+    end
+    finish(value)
 end)
+
+local ok, value = pcall(function()
+    if contract == Snapshot then
+        return Snapshot.run(request, {
+            now = os.clock, wait = task.wait, snapshot = snapshot,
+            read = function(check) return Reader.read(Snapshot, game, check) end,
+        })
+    end
+    return Core.run(Protocol, request, {
+        now = os.clock,
+        wait = task.wait,
+        addPlayer = function() StudioTestService:AddPlayers(1) end,
+        snapshot = snapshot,
+    })
+end)
+if not ok then
+    warn("Regression Arena: scenario API/runtime error.", value)
+    value = contract.failure(request, "Server scenario API/runtime error", os.clock() - started,
+        "Read server Output; check StudioTestService:AddPlayers support for latejoin.")
+end
+finish(value)

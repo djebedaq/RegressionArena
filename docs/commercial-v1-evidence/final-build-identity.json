@@ -1,0 +1,16 @@
+{
+  "dateUTC": "2026-10-17T21:37:39.503849+00:00",
+  "pluginSourceSHA256": "3e5fdd7f7a5c992d2625a81a8cb692b31b24eac21401ae5c269176290cfe9c00",
+  "previousPluginSourceSHA256": "dbd8c666496cc9c848db6bf8794eaff5b5998056077a75faf5716693050c4316",
+  "onlyChange": "Two presentation properties on legacy Smoke TextLabels: top alignment and automatic vertical size.",
+  "allOtherPluginCodeIdentical": true,
+  "embeddedRunnerIdentical": true,
+  "installedMatchesGenerated": true,
+  "offlinePythonChecks": 22,
+  "luauMockCases": 100,
+  "files": {
+    "RegressionArena.rbxmx": "872b8bc14ed494c8fd5de4c33b9edf55189c76e5a2b3d60d1a0c7f6043889ba4",
+    "RegressionArena-1.0.0.zip": "9fa1feded57713997a58dfd701d404ecbe5d84ea8ec59d1cdbf8e23a48161003",
+    "RegressionArena-Demo.rbxlx": "fc2a739105cecfd16616958eef8e47425ab436d495c1189a68ee0c7837b44635"
+  }
+}

@@ -1,0 +1,36 @@
+Actual Luau CLI mock regression; NOT Roblox Studio execution.
+2026-10-14T09:56:22.337146+00:00
+
+Unmodified Session from b31031a (expected failure):
+EXIT STATUS: 1
+PASS valid session returns only matching proven result and releases ownership
+PASS normal edit-mode transition may settle without discarding success
+PASS Execute API errors become failure and allow retry
+PASS unexpected native table result fails closed
+FAIL nil native transport stays quarantined despite idle edit mode: D:/RegressionArena-main/RegressionArena-main/tests/luau/tmpjn2wkoj0.luau:65: assertion failed!
+stacktrace:
+[C] function error
+D:/RegressionArena-main/RegressionArena-main/tests/luau/Support.luau:4 function test
+D:/RegressionArena-main/RegressionArena-main/tests/luau/tmpjn2wkoj0.luau:62
+
+Current Session:
+EXIT STATUS: 0
+PASS valid session returns only matching proven result and releases ownership
+PASS normal edit-mode transition may settle without discarding success
+PASS Execute API errors become failure and allow retry
+PASS unexpected native table result fails closed
+PASS nil native transport stays quarantined despite idle edit mode
+PASS oversized native result fails before decoding
+PASS malformed JSON and stale nonce fail closed
+PASS watchdog does not unlock unresolved native call or accept late PASS
+PASS cancellation discards results and retains pending native ownership
+PASS native completion just beyond watchdog deadline cannot sneak through polling
+PASS unload requests cleanup and never permits another run
+PASS without server EndTest a cancelled native call stays locked
+PASS unrelated active playtest is never stopped or executed over
+PASS cleanup-required result never earns PASS
+PASS back-to-back runs do not retain stale successful state
+PASS native completion waits for stable edit mode before the next launch
+PASS delayed cleanup beyond three edit seconds keeps the next launch locked
+PASS late edit transition still receives a complete settling interval
+MOCK TESTS: 18 passed; no Roblox Studio execution

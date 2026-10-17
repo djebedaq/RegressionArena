@@ -1,0 +1,73 @@
+[
+  {
+    "event": "plan-1-Run-click",
+    "utc": "2026-10-17T14:50:02.044Z",
+    "players": 1,
+    "scenarios": [
+      "join",
+      "spawn",
+      "latejoin"
+    ],
+    "timeoutSeconds": 180,
+    "distSHA256": "b832f68555ae1ac2390e79cdd1de3d1080dce5bcba061ba6d38c05c636da6f06"
+  },
+  {
+    "event": "plan-2-Run-click",
+    "utc": "2026-10-17T14:52:29.455Z",
+    "players": 1,
+    "scenarios": [
+      "join",
+      "spawn",
+      "latejoin"
+    ],
+    "timeoutSeconds": 180,
+    "manualStopsSincePlan1": 0
+  },
+  {
+    "event": "plan-3-Run-click",
+    "utc": "2026-10-17T14:54:44.520Z",
+    "players": 1,
+    "scenarios": [
+      "join",
+      "spawn",
+      "latejoin"
+    ],
+    "timeoutSeconds": 180,
+    "manualStopsSincePlan1": 0
+  },
+  {
+    "event": "three-plan-gate-observed",
+    "utc": "2026-10-17T14:57:10.429Z",
+    "plans": 3,
+    "allPassed": true,
+    "manualStops": 0,
+    "studioVersion": "0.743.0.7431133",
+    "build": "b832f68555ae1ac2390e79cdd1de3d1080dce5bcba061ba6d38c05c636da6f06"
+  },
+  {
+    "event": "delayed-table-Run-click",
+    "utc": "2026-10-17T15:05:20.456Z",
+    "players": 1,
+    "scenario": "join",
+    "timeoutSeconds": 5,
+    "fixtureDelaySeconds": 65,
+    "build": "9b56d8bb360e95bf31d27dd5949666a31d20d2dbc0e9737b2e2f832f8a89ac0c"
+  },
+  {
+    "event": "delayed-table-retry-check",
+    "utc": "2026-10-17T15:07:25.187Z",
+    "afterNativeClosure": true
+  },
+  {
+    "event": "delayed-table-second-retry-check",
+    "utc": "2026-10-17T15:08:03.807Z"
+  },
+  {
+    "event": "fault-detached-baseline-verified",
+    "utc": "2026-10-17T15:10:45.574Z",
+    "runnerSourceUnchanged": true,
+    "runnerEnabled": true,
+    "serverScripts": 1,
+    "serverStorage": 0
+  }
+]

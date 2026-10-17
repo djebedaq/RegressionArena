@@ -1,0 +1,10 @@
+{
+  "product": "Regression Arena",
+  "version": "1.0.0",
+  "status": "release candidate",
+  "supportedConfiguration": "one initial player; latejoin to two clients",
+  "files": {
+    "RegressionArena.plugin.luau": "3e5fdd7f7a5c992d2625a81a8cb692b31b24eac21401ae5c269176290cfe9c00",
+    "RegressionArena.rbxmx": "872b8bc14ed494c8fd5de4c33b9edf55189c76e5a2b3d60d1a0c7f6043889ba4"
+  }
+}

@@ -1,0 +1,51 @@
+Luau mock regression only; no Roblox Studio execution.
+
+PRE-FIX SOURCE (preserved preflight snapshot)
+EXIT STATUS: 1
+PASS valid session returns only matching proven result and releases ownership
+PASS normal edit-mode transition may settle without discarding success
+PASS Execute API errors become failure and allow retry
+PASS unexpected native table result fails closed
+PASS nil native transport stays quarantined despite idle edit mode
+PASS oversized native result fails before decoding
+PASS malformed JSON and stale nonce fail closed
+PASS watchdog does not unlock unresolved native call or accept late PASS
+PASS cancellation discards results and retains pending native ownership
+PASS native completion just beyond watchdog deadline cannot sneak through polling
+PASS unload requests cleanup and never permits another run
+PASS without server EndTest a cancelled native call stays locked
+PASS unrelated active playtest is never stopped or executed over
+PASS cleanup-required result never earns PASS
+PASS back-to-back runs do not retain stale successful state
+PASS native completion waits for stable edit mode before the next launch
+PASS delayed cleanup beyond three edit seconds keeps the next launch locked
+PASS late edit transition still receives a complete settling interval
+FAIL nil transport arriving after watchdog never releases native ownership: ./tests/luau/Session.spec.luau:166: Late nil transport must remain quarantined
+stacktrace:
+[C] function error
+./tests/luau/Support.luau:4 function test
+./tests/luau/Session.spec.luau:159
+
+CURRENT SOURCE
+EXIT STATUS: 0
+PASS valid session returns only matching proven result and releases ownership
+PASS normal edit-mode transition may settle without discarding success
+PASS Execute API errors become failure and allow retry
+PASS unexpected native table result fails closed
+PASS nil native transport stays quarantined despite idle edit mode
+PASS oversized native result fails before decoding
+PASS malformed JSON and stale nonce fail closed
+PASS watchdog does not unlock unresolved native call or accept late PASS
+PASS cancellation discards results and retains pending native ownership
+PASS native completion just beyond watchdog deadline cannot sneak through polling
+PASS unload requests cleanup and never permits another run
+PASS without server EndTest a cancelled native call stays locked
+PASS unrelated active playtest is never stopped or executed over
+PASS cleanup-required result never earns PASS
+PASS back-to-back runs do not retain stale successful state
+PASS native completion waits for stable edit mode before the next launch
+PASS delayed cleanup beyond three edit seconds keeps the next launch locked
+PASS late edit transition still receives a complete settling interval
+PASS nil transport arriving after watchdog never releases native ownership
+PASS cancelled session with late invalid transport remains quarantined
+MOCK TESTS: 20 passed; no Roblox Studio execution

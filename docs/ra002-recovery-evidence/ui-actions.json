@@ -1,0 +1,224 @@
+[
+  {
+    "event": "native-2-start-click",
+    "utc": "2026-10-14T07:50:36.173Z",
+    "configuredClients": 2,
+    "runnerInstalled": false,
+    "toolboxClosed": true,
+    "terrainEditorClosed": true
+  },
+  {
+    "event": "native-2-EndSession-click",
+    "utc": "2026-10-14T07:58:43.007Z",
+    "reason": "native-control-complete",
+    "observedPlayers": 2,
+    "observedReady": 2
+  },
+  {
+    "event": "RA-1-plan-1-Run-click",
+    "utc": "2026-10-14T08:56:41.543Z",
+    "players": 1,
+    "scenarios": [
+      "join",
+      "spawn",
+      "latejoin"
+    ],
+    "timeoutSeconds": 180
+  },
+  {
+    "event": "RA-1-plan-2-Run-click",
+    "utc": "2026-10-14T09:06:00.679Z",
+    "players": 1,
+    "scenarios": [
+      "join",
+      "spawn",
+      "latejoin"
+    ],
+    "timeoutSeconds": 180,
+    "reason": "Repeat after all child processes exited; available RAM recovered above 2.7 GiB; unchanged build"
+  },
+  {
+    "event": "RA-1-plan-2-server-EndSession-click",
+    "utc": "2026-10-14T09:10:52.704Z",
+    "reason": "FAILED plan: nil transport left orphan server/client; never counted as successful cleanup"
+  },
+  {
+    "event": "RA-fixed-1-plan-1-Run-click",
+    "utc": "2026-10-14T09:16:24.643Z",
+    "players": 1,
+    "scenarios": [
+      "join",
+      "spawn",
+      "latejoin"
+    ],
+    "timeoutSeconds": 180,
+    "distributionSHA256": "e6c8e4eed427453af77149c592d8a803330c93cbfbb73c39f1edbc3547a1551b"
+  },
+  {
+    "event": "RA-fixed-1-plan-1-server-EndSession-click",
+    "utc": "2026-10-14T09:23:00.160Z",
+    "reason": "FAILED watchdog plan; server GetTestArgs still nil after startup; no successful session manually stopped"
+  },
+  {
+    "event": "RA-fixed-1-plan-2-Run-click",
+    "utc": "2026-10-14T09:23:53.247Z",
+    "players": 1,
+    "scenarios": [
+      "join",
+      "spawn",
+      "latejoin"
+    ],
+    "timeoutSeconds": 180,
+    "reason": "Repeat fixed build after explicit failed-session cleanup; only main window/process, about 2.4 GiB available RAM",
+    "outcome": "Refused: previous native ownership awaiting stable edit recovery; no plan launched"
+  },
+  {
+    "event": "RA-fixed-1-plan-2-Run-retry-click",
+    "utc": "2026-10-14T09:24:27.657Z",
+    "players": 1,
+    "scenarios": [
+      "join",
+      "spawn",
+      "latejoin"
+    ],
+    "timeoutSeconds": 180
+  },
+  {
+    "event": "RA-fixed-1-plan-3-Run-click",
+    "utc": "2026-10-14T09:30:05.572Z",
+    "players": 1,
+    "scenarios": [
+      "join",
+      "spawn",
+      "latejoin"
+    ],
+    "timeoutSeconds": 180,
+    "previousPlan": "3/3 PASS; only main Studio window/process remained"
+  },
+  {
+    "event": "RA-fixed-1-plan-4-Run-click",
+    "utc": "2026-10-14T09:39:00.078Z",
+    "players": 1,
+    "scenarios": [
+      "join",
+      "spawn",
+      "latejoin"
+    ],
+    "timeoutSeconds": 180,
+    "previousPlan": "3/3 PASS; hidden server process exited naturally by 09:38:10Z; no Stop or process termination"
+  },
+  {
+    "event": "RA-fixed-1-plan-4-server-EndSession-click",
+    "utc": "2026-10-14T09:46:20.084Z",
+    "reason": "FAILED nil transport with orphan windows; not a successful session"
+  },
+  {
+    "event": "RA-final-2-join-Run-click",
+    "utc": "2026-10-14T09:51:59.985Z",
+    "players": 2,
+    "scenarios": [
+      "join"
+    ],
+    "timeoutSeconds": 180,
+    "distributionSHA256": "83e132b748cf1f2d56c8dfad517aa8117fd5fcf9c695f5bb90f3ba753e817a54"
+  },
+  {
+    "event": "ST14-empty-plan-Run-click",
+    "utc": "2026-10-14T09:54:45.282Z",
+    "players": 2,
+    "scenarios": []
+  },
+  {
+    "event": "ST14-empty-plan-Save-click",
+    "utc": "2026-10-14T09:54:54.929Z",
+    "expected": "refuse without modifying preset"
+  },
+  {
+    "event": "RA-final-2-spawn-Run-click",
+    "utc": "2026-10-14T09:55:19.696Z",
+    "players": 2,
+    "scenarios": [
+      "spawn"
+    ],
+    "timeoutSeconds": 180,
+    "distributionSHA256": "83e132b748cf1f2d56c8dfad517aa8117fd5fcf9c695f5bb90f3ba753e817a54"
+  },
+  {
+    "event": "RA-final-niltransport-Run-click",
+    "utc": "2026-10-14T09:58:29.306Z",
+    "players": 1,
+    "scenarios": [
+      "join"
+    ],
+    "timeoutSeconds": 180,
+    "fixture": "RA002_NilTransport; Fault=niltransport; expected FAIL with permanent session quarantine"
+  },
+  {
+    "event": "RA-final-niltransport-isolated-Run-click",
+    "utc": "2026-10-14T10:01:00.177Z",
+    "players": 1,
+    "scenarios": [
+      "join"
+    ],
+    "timeoutSeconds": 180,
+    "fixture": "Disable only owned marked test-server runner clone before EndTest(nil); edit runner remains enabled"
+  },
+  {
+    "event": "RA-final-niltransport-isolated-server-EndSession-click",
+    "utc": "2026-10-14T10:06:26.519Z",
+    "reason": "FAILED watchdog fault; EndTest(nil) did not terminate the isolated server"
+  },
+  {
+    "event": "RA-final-tabletransport-Run-click",
+    "utc": "2026-10-14T10:09:09.688Z",
+    "players": 1,
+    "scenarios": [
+      "join"
+    ],
+    "timeoutSeconds": 180,
+    "fixture": "invalidtransport; server clone disabled; sole EndTest result is table",
+    "outcome": "Refused while native ownership began stable edit recovery; no launch"
+  },
+  {
+    "event": "RA-final-tabletransport-Run-retry-click",
+    "utc": "2026-10-14T10:10:06.296Z",
+    "players": 1,
+    "scenarios": [
+      "join"
+    ],
+    "timeoutSeconds": 180
+  },
+  {
+    "event": "RA-final-tabletransport-quarantine-Run-click",
+    "utc": "2026-10-14T10:12:30.677Z",
+    "expected": "Refuse any new Execute call even though only edit window remains"
+  },
+  {
+    "event": "RA-final-UI-tabletransport-Run-click",
+    "utc": "2026-10-14T10:22:36.575Z",
+    "players": 1,
+    "scenarios": [
+      "join"
+    ],
+    "timeoutSeconds": 180,
+    "distributionSHA256": "b832f68555ae1ac2390e79cdd1de3d1080dce5bcba061ba6d38c05c636da6f06"
+  },
+  {
+    "event": "RA-final-UI-quarantine-Run-click",
+    "utc": "2026-10-14T10:24:46.906Z",
+    "expected": "Refuse and explicitly require Studio restart"
+  },
+  {
+    "event": "final-safe-validation-observation",
+    "utc": "2026-10-14T10:30:47.196Z",
+    "studioWindows": 1,
+    "editVerifiedByOutput": true,
+    "runnerSourceUnchanged": true,
+    "runnerEnabled": true,
+    "serverScriptServiceChildren": 1,
+    "serverStorageChildren": 0,
+    "localPlaceSaved": true,
+    "quarantineRequiresRestart": true,
+    "ST01": "Two resize drags did not change the observed 181x702 floating panel; exact 300x300 remains UNVERIFIED"
+  }
+]
