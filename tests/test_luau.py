@@ -53,6 +53,9 @@ class LuauChecks(unittest.TestCase):
     def test_session_timeout_cancellation_and_recovery(self):
         self.run_script(ROOT / "tests/luau/Session.spec.luau")
 
+    def test_snapshot_assertions_baseline_and_comparison(self):
+        self.run_script(ROOT / "tests/luau/Snapshot.spec.luau")
+
     def test_install_remove_ownership_and_rollback(self):
         self.run_script(ROOT / "tests/luau/RunnerManager.spec.luau")
 

@@ -24,5 +24,6 @@ jobs:
           unzip -q /tmp/ra-luau.zip -d /tmp/ra-luau
           chmod +x /tmp/ra-luau/luau /tmp/ra-luau/luau-compile
       - run: python scripts_build.py
+      - run: python scripts_release.py
       - run: git diff --exit-code -- dist/
       - run: python -m unittest discover -s tests -v

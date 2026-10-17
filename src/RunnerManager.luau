@@ -2,7 +2,7 @@
 local Manager = {}
 Manager.NAME = "RegressionArena_TestRunner"
 Manager.OWNER = "RegressionArena"
-Manager.VERSION = "0.2.0"
+Manager.VERSION = "1.0.0"
 
 function Manager.find(env, source)
     local found = nil
@@ -25,7 +25,7 @@ function Manager.change(env, source, remove)
     local runner = Manager.find(env, source)
     if remove and not runner then return "No owned runner installed." end
     if not remove and runner and runner.Enabled and runner.RunContext == env.legacyContext then
-        return "Runner 0.2.0 is already current."
+        return "Runner " .. Manager.VERSION .. " is already current."
     end
     local candidate = nil
     if not remove and not runner then
@@ -71,7 +71,7 @@ function Manager.change(env, source, remove)
         pcall(env.finishRecording, recording, false)
         error(tostring(err) .. (restored and "" or "; rollback failed: " .. tostring(restoreError)))
     end
-    return remove and "Owned runner removed. Undo is available." or "Runner 0.2.0 ready. Undo is available."
+    return remove and "Owned runner removed. Undo is available." or "Runner " .. Manager.VERSION .. " ready. Undo is available."
 end
 
 return Manager

@@ -1,0 +1,13 @@
+{
+  "sampleCount": 120,
+  "beginUTC": "2026-10-17T14:49:41.4844589Z",
+  "endUTC": "2026-10-17T15:02:39.9668386Z",
+  "minFreeRAMMiB": 333.0,
+  "maxSystemCPUPercent": 100.0,
+  "maxStudioProcesses": 4,
+  "maxUnresponsiveStudioProcesses": 0,
+  "notes": [
+    "Passive measurements, including startup and cleanup; not proof of engine root cause.",
+    "Private commit is not resident RAM. No two-initial-player or four-client test was run."
+  ]
+}

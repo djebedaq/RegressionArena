@@ -1,0 +1,6 @@
+2026-10-17T15:05:20.442Z Handling request to start test
+2026-10-17T15:05:32.082Z RA002_FAULT owned server runner clone disabled
+2026-10-17T15:05:32.082Z RA10_FAULT delayed transport seconds 65
+2026-10-17T15:06:36.686Z Handling test has ended
+2026-10-17T15:06:37.096Z RA002_FAULT deliberately table EndTest transport
+2026-10-17T15:06:37.097Z Sending test result to [process]

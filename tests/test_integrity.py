@@ -10,7 +10,7 @@ class IntegrityChecks(unittest.TestCase):
         runner = (ROOT / "src/TestRunner.server.luau").read_text(encoding="utf-8")
         self.assertLess(runner.index("if not RunService:IsStudio() or not RunService:IsServer() then return end"),
                         runner.index('game:GetService("StudioTestService")'))
-        self.assertLess(runner.index("not Protocol.validRequest(request) then return end"), runner.index("task.delay("))
+        self.assertLess(runner.index("not contract.validRequest(request) then return end"), runner.index("task.delay("))
 
     def test_no_external_network_dynamic_code_or_game_data_access(self):
         source = "\n".join(path.read_text(encoding="utf-8") for path in (ROOT / "src").glob("*.luau"))

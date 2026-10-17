@@ -1,56 +1,81 @@
-# Regression Arena — v0.2 prototype
+# Regression Arena 1.0 — release candidate
 
-**Status: RA-001 implementation with real Roblox Studio evidence. Validation is incomplete; see the recorded PASS/FAIL/UNVERIFIED matrix. Not production-ready or approved for sale.**
+Regression Snapshot records explicit expectations for Roblox server state and
+compares a fresh run with a successful local baseline. Create checks for object
+presence, supported properties and Attributes: exact primitive values or inclusive
+numeric ranges. Results show PASS/FAIL, expected and actual values, and reasons.
 
-[RA-002 diagnostics](docs/RA-002_DIAGNOSTICS.md) continue the native-control and two-player stability investigation in the same Draft PR. The independent four-client control also encountered environment/UI responsiveness failures; reliable two-player repeatability is still pending.
+**Release gate: work in progress.** The production asset and buyer ZIP exist;
+remaining Studio acceptance and GitHub CI must pass before a READY decision. No
+Creator Store publication, paid listing or release-PR merge has been authorized.
+See [release status](docs/COMMERCIAL_RELEASE_STATUS.md) and the
+[Studio acceptance matrix](docs/COMMERCIAL_STUDIO_MATRIX.md).
 
-Regression Arena runs repeatable multiplayer smoke checks in a local Roblox Studio place copy. Select `join`, `spawn`, and `latejoin` independently, choose 1/2/4 initial players, and give each case a whole-number timeout of 5–180 seconds (default 60). Each case starts its own multiplayer session. Latejoin requests one additional player after the initial group joins. Slower machines can need a larger budget for local client startup.
+## Start here
 
-A PASS requires a matching run identifier, strict result schema, and scenario evidence. Reports include expected/observed behavior, elapsed seconds, counts, and a suggested next check. A timed-out, cancelled, malformed, or stale result cannot become PASS. Infrastructure failure aborts the remaining cases with explicit “not run” failures.
+- [Buyer guide: install, configure, baseline, export, remove and recover](release/BUYER_GUIDE.md)
+- [Clean demonstration project](demo/README.md)
+- [Real Studio evidence, with build identities](docs/commercial-v1-evidence/README.md)
+- [Creator Store draft](release/CREATOR_STORE_DRAFT.md), [pricing research](release/MARKET_AND_PRICE.md), [compliance review](release/COMPLIANCE.md)
 
-## Install and run locally
+Open `dist/RegressionArena.rbxmx` in Studio, select its single RegressionArena
+Script and choose **Plugins > Save as Local Plugin**. Close that asset without
+saving changes, then open a disposable local place copy. In Regression Arena's
+Setup tab, explicitly install the owned 1.0 runner. Load the demonstration plan
+from Snapshot while using a copy of `demo/RegressionArena-Demo.rbxlx`.
 
-1. Open a **disposable, local copy** of a simple place. Game scripts still execute during tests; keep production credentials, live data access, purchases, and external integrations out of this copy. Regression Arena does not intercept game code or sandbox its side effects.
-2. Insert a temporary `Script` named `RegressionArena` under `ServerStorage`; paste `dist/RegressionArena.plugin.luau` into its Source. Local installation was verified in Studio 0.742 without changing security settings.
-3. Select it and use **Plugins → Save as Local Plugin**. Delete the temporary Script. Open Regression Arena using its toolbar button.
-4. In edit mode, click **Install / repair runner**. The sole place asset created is `ServerScriptService.RegressionArena_TestRunner`, with `RAOwner=RegressionArena`, `RAVersion=0.2.0`, and server Legacy run context. Installation/removal use undo recordings.
-5. Select the player count, toggle cases, and enter the timeout under each case. Click **Run selected test plan**. The vertically scrolling panel remains usable in a small dock.
-6. Inspect the counts and diagnosis. Click Results and use Ctrl+A / Ctrl+C to copy text and JSON. **Show last saved report** is explicitly labeled as a previous run.
-7. **Save local preset** / **Load local preset** retain one plan in plugin settings, without adding game assets. History retains at most ten reports, each at most 8 KiB. The preset is at most 2 KiB when loaded. Writes are checked by immediate readback; settings errors do not turn a failed test into success.
+Use stable values and a project key unique to your place. At most 16 assertions,
+one local plan, one successful baseline and one last Snapshot report are stored.
+Smoke retains up to ten reports. Export JSON by selecting it in Results, Ctrl+C,
+and pasting into a local file. No importing arbitrary plans or headless CI runner
+is included. The detailed guide lists supported paths, properties and limits.
 
-## Update, remove and recover
+## Supported scope
 
-- Repeating Install is idempotent. For an unchanged v0.2 runner, it also repairs a disabled script or incorrect run context.
-- A matching name alone is never ownership. Duplicate names, missing ownership/version attributes, unsupported versions, changed Source, unsaved editor changes, and child content all block running/updating/removing that runner.
-- **v0.1 migration:** its untagged runner is deliberately not adopted. In your disposable place, inspect and preserve it yourself, then rename it out of the reserved name or manually remove it only after confirming it contains no work to keep. Install v0.2 afterward.
-- Before loading a future plugin build with different runner source, use the **old build's Remove owned runner** first. Then reload the local plugin and install the new runner. There is no automatic overwrite of unknown or modified runner content.
-- **Remove owned runner** detaches only the exact owned, unmodified runner in edit mode. Undo restores it. Other scripts and player data are not touched by the plugin.
-- **Cancel results (server finishes)** discards the pending result and skips remaining cases. The server still ends through EndTest or its scenario deadline. For immediate termination, use Studio **Stop / End Session**. Roblox's LeaveTest methods are client-only and cannot stop the whole session from a plugin.
-- The plugin watchdog allows the case timeout plus 30 seconds for launch/transport, then up to 10 seconds to observe recovery. Native ownership is released only after Execute returns and edit mode stays true for 3 seconds, preventing a delayed previous Stop action from interrupting the next case. These are cooperative Lua deadlines; engine stalls can exceed them, and actual elapsed time is preserved.
-- Another native test remains blocked while its previous call is outstanding. Missing arguments or a failed EndTest can require Studio Stop; reopen the disposable place if Studio remains hung. Closing the panel merely hides it; unloading discards pending results and does not pretend to terminate the engine session.
-- Outside Studio, the runner returns before accessing test services. In Studio it also requires server context and valid v0.2 test arguments. Ordinary unmarked playtests receive no scenario execution, player additions, or EndTest calls.
-- The installed Script is included if you save/publish the place with it present. Remove it before shipping your game. This task does not publish anything.
+**One initial player; Smoke latejoin to two clients.** Smoke checks join, spawn
+and retained initial players with one new latejoin identity. Snapshot reads server
+state once after spawning and the configured checkpoint delay. It does not prove
+client UI/gameplay readiness or detect every bug. Two initial players and
+four-client mode are excluded. No four-client test is repeated on this machine.
 
-## Developer checks
+The product is offline-first with no AI API, telemetry, remote HTTP endpoint,
+subscription, custom payment/licensing system or remote executable dependency.
+Ordinary Studio networking for native multiplayer tests still applies. Game scripts
+still execute: use a disposable copy with live data access, purchases and external
+integrations disabled by you. This plugin does not sandbox game behavior.
 
-`src/` is authoritative. Never edit generated distribution code.
+Setup installs only `ServerScriptService.RegressionArena_TestRunner`, explicitly
+owned and versioned. Install/remove use Undo and reject unknown or edited content.
+Before updating, remove the runner using the old matching plugin, then update the
+plugin and install the new runner. Remove the runner before shipping a game.
+Published-runtime validation remains UNVERIFIED; no game was published for testing.
 
-```bash
+Cancel discards results while the server still finishes. The shared native lock
+prevents overlapping Snapshot/Smoke launches. Invalid native returns require a
+Studio restart. The guide explains manual End Session and recovery.
+
+## Build and developer checks
+
+`src/` is the source of truth. Never edit generated `dist/` code manually.
+
+```powershell
 python scripts_build.py
 python -m unittest discover -s tests -v
+python scripts_release.py
 ```
 
-Python uses only the standard library. For Luau mock execution and syntax compilation, install the official [Luau CLI 0.742](https://github.com/luau-lang/luau/releases/tag/0.742), put the tools on PATH, or set `LUAU_BIN` and `LUAU_COMPILE_BIN`. A local `.tools/luau/` installation is also detected and ignored by Git. Without tools, those tests explicitly report SKIPPED; build/integrity checks still run. CI installs the pinned official Linux release with a SHA-256 check and requires all tests, plus an unchanged rebuilt distribution.
+The standalone plugin asset has exactly one readable Script. The deterministic
+buyer ZIP contains that asset, a script-free demo, the buyer guide, instructions
+and a hash manifest; no developer fixtures/debug/test files are included. GitHub
+CI compiles generated Luau and runs mock/build/package checks. Python/Luau mocks
+are **not Roblox Studio execution tests**. Real UI/engine evidence is recorded
+separately with exact plugin hashes and all observed failures.
 
-The Luau tests execute the actual protocol, scenario, session, installation and history modules against mocks, including the generated server boundary. **They do not execute Roblox Studio, validate API permissions, or demonstrate real multiplayer success.** See the [verification record](docs/RA-001_VERIFICATION.md), [actual Studio evidence](docs/studio-evidence/README.md), [API audit](docs/API_AUDIT.md), and exact [Studio validation procedure](docs/STUDIO_VALIDATION.md).
+## Preserved development history
 
-No network requests, telemetry, accounts, AI API, subscriptions, licensing or payment layer are implemented. HttpService is used only for local JSON encoding/decoding and random run identifiers. Reports contain counts and predefined diagnoses, not game source, player names, or user IDs. Only the owned runner source is inspected for integrity.
-
-Custom spawn systems must produce parented characters with Humanoids to pass the current spawn assertion. No client UI, game remotes, purchases, combat, matchmaking, or data-store assertions are implemented. A paid-feature proposal stays behind the human Studio-validation gate defined in RA-001.
-
-## Working instructions and references
-
-Start with [AGENTS.md](AGENTS.md), [CODEX_START_HERE.md](CODEX_START_HERE.md), and [RA-001](docs/CODEX_TASK.md).
-
-- [Official StudioTestService API](https://create.roblox.com/docs/reference/engine/classes/StudioTestService)
-- [Official Studio plugin guide](https://create.roblox.com/docs/studio/plugins)
+The previous v0.2 README, including recovery findings and local documentation work,
+is preserved in [V02_README.md](docs/V02_README.md). Historical 1/2/4-player prototype
+options are not current commercial support claims. Read [CODEX_TASK](docs/CODEX_TASK.md),
+[STUDIO_VALIDATION](docs/STUDIO_VALIDATION.md), [API_AUDIT](docs/API_AUDIT.md),
+[RA-002_DIAGNOSTICS](docs/RA-002_DIAGNOSTICS.md) and the newer
+[Phase 1 evidence](docs/commercial-phase1-evidence/README.md) for the full record.

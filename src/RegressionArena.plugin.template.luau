@@ -1,4 +1,4 @@
--- Regression Arena v0.2. Offline Studio smoke tests. Generated distribution includes the runner.
+-- Regression Arena 1.0 release candidate. Generated offline plugin, including its owned runner.
 local StudioTestService = game:GetService("StudioTestService")
 local ServerScriptService = game:GetService("ServerScriptService")
 local HttpService = game:GetService("HttpService")
@@ -9,9 +9,12 @@ local Protocol = __PROTOCOL__
 local Manager = __RUNNER_MANAGER__
 local Session = __SESSION__
 local Settings = __SETTINGS__
+local Snapshot = __SNAPSHOT__
+local Interface = __INTERFACE__
+local SnapshotUI = __SNAPSHOT_UI__
 local RUNNER_SOURCE = __EMBEDDED_RUNNER_SOURCE__
-local HISTORY_KEY = "regression-arena-v02-history"
-local PRESET_KEY = "regression-arena-v02-preset"
+local HISTORY_KEY = "regression-arena-v1-smoke-history"
+local PRESET_KEY = "regression-arena-v1-smoke-preset"
 local disposed, busy, stopRequested = false, false, false
 local history = {}
 
@@ -47,9 +50,10 @@ local palette = {
 local toolbar = plugin:CreateToolbar("Regression Arena")
 local openButton = toolbar:CreateButton("Regression Arena", "Open local multiplayer test plan", "")
 openButton.ClickableWhenViewportHidden = true
-local widget = plugin:CreateDockWidgetPluginGuiAsync("RegressionArenaPanel02",
-    DockWidgetPluginGuiInfo.new(Enum.InitialDockState.Right, false, false, 380, 650, 300, 300))
-widget.Title = "Regression Arena - v0.2"
+local widget = plugin:CreateDockWidgetPluginGuiAsync("RegressionArenaPanel10",
+    DockWidgetPluginGuiInfo.new(Enum.InitialDockState.Right, false, false, 420, 680, 300, 300))
+widget.Title = "Regression Arena 1.0"
+local UI = Interface.new(widget)
 local root = Instance.new("ScrollingFrame")
 root.Size = UDim2.fromScale(1, 1)
 root.BackgroundColor3 = palette.panel
@@ -57,7 +61,7 @@ root.BorderSizePixel = 0
 root.ScrollBarThickness = 6
 root.CanvasSize = UDim2.new()
 root.AutomaticCanvasSize = Enum.AutomaticSize.Y
-root.Parent = widget
+root.Parent = UI.pages.Smoke
 local layout = Instance.new("UIListLayout")
 layout.Padding = UDim.new(0, 6)
 layout.SortOrder = Enum.SortOrder.LayoutOrder
@@ -79,7 +83,9 @@ local function label(value, height)
     item.BackgroundTransparency = 1
     item.TextColor3 = palette.text
     item.TextXAlignment = Enum.TextXAlignment.Left
+    item.TextYAlignment = Enum.TextYAlignment.Top
     item.TextWrapped = true
+    item.AutomaticSize = Enum.AutomaticSize.Y
     item.Font = Enum.Font.Gotham
     item.TextSize = 12
     item.Text = value
@@ -104,27 +110,25 @@ local function button(value, callback)
 end
 
 label("Multiplayer Test Plan", 24).TextSize = 18
-label("Local tests only. Use a disposable place copy: your game's own scripts still run.", 36)
+label("One initial player; latejoin adds a second. Use a disposable place copy: your game's own scripts still run.", 62)
 local status -- Filled before callbacks can be invoked.
 local function notify(message, failed)
     if disposed then return end
     status.Text = message
     status.TextColor3 = failed and palette.red or palette.secondary
+    UI:status(message, failed)
 end
 local function changeRunner(remove)
     local ok, message = pcall(function()
         if not session:ready() then error("Wait for the current native test to return to edit mode.") end
         return Manager.change(managerEnv, RUNNER_SOURCE, remove)
     end)
-    notify(tostring(message):sub(1, 512), not ok)
+    notify((tostring(message):gsub("^.-:%d+:%s*", "")):sub(1, 512), not ok)
 end
-button("Install / repair runner", function() changeRunner(false) end)
-button("Remove owned runner", function() changeRunner(true) end)
-local playerOptions, playerIndex = { 1, 2, 4 }, 2
+local playerOptions, playerIndex = { 1 }, 1
 local playerButton
-playerButton = button("Players: 2 (click to switch)", function()
-    playerIndex = playerIndex % #playerOptions + 1
-    playerButton.Text = "Players: " .. playerOptions[playerIndex] .. " (click to switch)"
+playerButton = button("Players: 1 (supported configuration)", function()
+    notify("One initial player is supported. Latejoin adds a second client.", false)
 end)
 
 local cases = {}
@@ -141,7 +145,7 @@ for _, scenario in ipairs(Protocol.SCENARIOS) do
     timeout.ClearTextOnFocus = false
     timeout.Font = Enum.Font.Code
     timeout.TextSize = 12
-    timeout.Text = "60"
+    timeout.Text = "180"
     timeout.PlaceholderText = scenario .. " timeout seconds (5-180)"
     place(timeout, 26)
     label(scenario .. " timeout in seconds (5-180, includes joining)", 18)
@@ -179,9 +183,9 @@ button("Save local preset", function()
 end)
 button("Load local preset", function()
     local plan = Protocol.copyPlan(decodeBounded(readSetting(PRESET_KEY), 2048))
-    if not plan then notify("No valid local preset. Current plan kept.", true); return end
+    if not plan or plan.players ~= 1 then notify("No supported local preset. Current plan kept.", true); return end
     for index, count in ipairs(playerOptions) do if count == plan.players then playerIndex = index end end
-    playerButton.Text = "Players: " .. plan.players .. " (click to switch)"
+    playerButton.Text = "Players: 1 (supported configuration)"
     for _, entry in ipairs(cases) do
         entry.selected = false
         for _, case in ipairs(plan.cases) do
@@ -193,17 +197,23 @@ button("Load local preset", function()
 end)
 
 local runButton
+local invalidateSnapshot = function() end
 local function setBusy(value)
     busy = value
+    if value then invalidateSnapshot() end
+    UI:setBusy(value)
     for _, item in ipairs(controls) do item.Active = not value; item.AutoButtonColor = not value end
     for _, entry in ipairs(cases) do entry.input.TextEditable = not value end
     runButton.Text = value and "Running test plan..." or "Run selected test plan"
 end
 
 local report
-local function render(summary)
+local function render(summary, previous)
     local lines = {}
+    local rows = {}
     for _, result in ipairs(summary.tests) do
+        table.insert(rows, { passed = result.passed, text = string.format("%s %s (%.2fs)\nExpected: %s\nActual: %s\nNext: %s",
+            result.passed and "PASS" or "FAIL", result.scenario, result.elapsed, result.expected, result.observed, result.nextCheck) })
         table.insert(lines, string.format("%s %s (%.2fs)", result.passed and "PASS" or "FAIL", result.scenario, result.elapsed))
         table.insert(lines, "Expected: " .. result.expected)
         table.insert(lines, "Observed: " .. result.observed)
@@ -211,13 +221,20 @@ local function render(summary)
     end
     local json = HttpService:JSONEncode(summary)
     report.Text = table.concat(lines, "\n") .. "\n\nREPORT JSON:\n" .. json
+    UI:results(previous and "SAVED REPORT — previous smoke run"
+        or string.format("%d/%d smoke cases passed", summary.passed, summary.total), rows, json)
     return json
 end
 
 runButton = button("Run selected test plan", function()
     local plan = readPlan()
     if not plan then notify("Select cases and enter whole-number timeouts from 5 to 180 seconds.", true); return end
-    if not session:ready() then notify("Previous test pending or Studio not in edit mode. Use Stop, then retry.", true); return end
+    if not session:ready() then
+        notify(session.pending and session.pending.ambiguous
+            and "Native cleanup unconfirmed. End all test windows and restart Studio before retrying."
+            or "Previous test pending or Studio not in edit mode. Use Stop, then retry.", true)
+        return
+    end
     local ok, runner = pcall(function() return Manager.find(managerEnv, RUNNER_SOURCE) end)
     if not ok or not runner or not runner.Enabled or runner.RunContext ~= Enum.RunContext.Legacy then
         notify("Install the current owned runner first. Resolve any Explorer name collision.", true); return
@@ -225,6 +242,7 @@ runButton = button("Run selected test plan", function()
     stopRequested = false
     setBusy(true)
     report.Text = "Current run has no verified results yet."
+    UI:results("RUNNING — no current smoke evidence", {}, "No current verified report yet.")
     task.spawn(function()
         local summary = { version = 2, dateUTC = os.date("!%Y-%m-%dT%H:%M:%SZ"), players = plan.players,
             passed = 0, total = #plan.cases, tests = {} }
@@ -253,6 +271,8 @@ runButton = button("Run selected test plan", function()
             session:cancel()
             warn("Regression Arena: suite error.", errorMessage)
             report.Text = "FAIL: plugin suite error; partial results discarded. Check Studio Output and Stop any active test."
+            UI:results("FAIL — plugin suite error", {{ passed = false,
+                text = "No complete verified suite report. Partial results discarded. Check Studio Output and end any active test." }}, "No complete verified report.")
             notify("Suite failed. Check Output; retry after Studio returns to edit mode.", true)
         else
             local finalized, saved = pcall(function()
@@ -278,12 +298,13 @@ stop.Text = "Cancel results (server finishes)"
 place(stop, 30)
 stop.MouseButton1Click:Connect(function()
     if disposed then return end
+    if not busy then notify("There is no active run.", false); return end
     stopRequested = true
     session:cancel()
     notify("Results cancelled. Server ends at its deadline; use Studio Stop for immediate termination.", true)
 end)
 
-status = label("Install the runner, select cases, then run. Studio validation is still required.", 50)
+status = label("Install the runner in Setup, select cases and run. Results provides the report and JSON export.", 58)
 report = Instance.new("TextBox")
 report.BackgroundColor3 = palette.card
 report.TextColor3 = palette.text
@@ -295,15 +316,39 @@ report.Text = "No test runs yet."
 place(report, 240)
 label("Click Results, Ctrl+A, Ctrl+C to copy text and JSON. Saved reports are never current-run evidence.", 36)
 button("Show last saved report", function()
-    report.Text = history[1] and ("SAVED REPORT (previous run)\n" .. history[1]) or "No saved report."
+    local summary = history[1] and Settings.summary(Protocol, decodeBounded(history[1], Protocol.MAX_REPORT_BYTES))
+    if summary then render(summary, true) else notify("No saved report.", false) end
 end)
 
 history = Settings.history(Protocol, readSetting(HISTORY_KEY),
     function(value) return HttpService:JSONDecode(value) end,
     function(value) return HttpService:JSONEncode(value) end)
+local snapshotController = SnapshotUI.mount({ ui = UI, plugin = plugin, snapshot = Snapshot, settings = Settings,
+    http = HttpService, session = session, isEdit = isEdit, selection = game:GetService("Selection"),
+    setBusy = setBusy, isBusy = function() return busy end,
+    changeRunner = changeRunner,
+    ready = function()
+        if not session:ready() then
+            notify(session.pending and session.pending.ambiguous
+                and "Native cleanup unconfirmed. End all test windows and restart Studio before retrying."
+                or "Previous native test is pending, or Studio is not in edit mode.", true)
+            return false
+        end
+        local ok, runner = pcall(function() return Manager.find(managerEnv, RUNNER_SOURCE) end)
+        if not ok or not runner or not runner.Enabled or runner.RunContext ~= Enum.RunContext.Legacy then
+            notify("Install the current owned runner in Setup. Preserve name collisions; remove older runners with their matching old plugin first.", true)
+            return false
+        end
+        return true
+    end,
+})
+invalidateSnapshot = snapshotController.invalidate
 openButton.Click:Connect(function() if not disposed then widget.Enabled = not widget.Enabled end end)
 plugin.Unloading:Connect(function()
     disposed = true
     stopRequested = true
     session:dispose()
+    UI.disposed = true
+    pcall(function() widget:Destroy() end)
+    pcall(function() toolbar:Destroy() end)
 end)

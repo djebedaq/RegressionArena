@@ -3,6 +3,13 @@ local S = require("./Support")
 local function run(options)
     options = options or {}
     local request = S.request(options.scenario)
+    if options.snapshot then
+        request={marker="RegressionArenaSnapshot",version=1,runId="snapshot-boundary",players=1,timeout=5,
+            plan={project="demo",name="Door",timeout=5,settle=1,checks={
+                {label="Door unlocked",path={"Workspace","Door"},source="attribute",key="Unlocked",operator="equals",expected=true}
+            }}}
+        if options.invalidSnapshot then request.plan.checks[1].source="property"; request.plan.checks[1].key="Source" end
+    end
     local state = { ends = 0, leaves = 0, delays = {}, services = {}, warnings = 0, argsReads = 0 }
     local service = {}
     function service:GetTestArgs()
@@ -23,6 +30,7 @@ local function run(options)
     function players:GetPlayers()
         local character = { Parent = true }
         function character:FindFirstChildOfClass() return true end
+        if options.snapshot then return {{Character=character}} end
         return options.noCharacters and { {}, {} } or { { Character = character }, { Character = character } }
     end
     local http = {}
@@ -48,9 +56,13 @@ local function run(options)
     }
     local warn = function() state.warnings += 1 end
     local game = {}
+    local door={Name="Door"}
+    function door:GetAttribute() return not options.brokenSnapshot end
+    local workspace={}
+    function workspace:GetChildren() return {door} end
     function game:GetService(name)
         table.insert(state.services,name)
-        return ({ RunService=runService, StudioTestService=service, Players=players, HttpService=http })[name]
+        return ({ RunService=runService, StudioTestService=service, Players=players, HttpService=http, Workspace=workspace })[name]
     end
     local function installedRunner()
 __RUNNER_UNDER_TEST__
@@ -103,5 +115,18 @@ S.test("server watchdog preserves spawn counts and actionable diagnosis",functio
     local state=run({scenario="spawn",noCharacters=true,fireDeadline=true})
     assert(state.ends==1 and not state.result.passed and state.result.evidence.readyCount==0)
     assert(state.result.evidence.finalCount==2 and string.find(state.result.nextCheck,"CharacterAutoLoads",1,true))
+end)
+S.test("marked Snapshot routes through real generated server boundary",function()
+    local state=run({snapshot=true})
+    assert(state.ends==1 and state.result.passed and state.result.status=="complete")
+    assert(state.result.results[1].actual.value==true and state.result.elapsed==1)
+end)
+S.test("broken Snapshot attribute becomes a measured failure",function()
+    local state=run({snapshot=true,brokenSnapshot=true})
+    assert(state.ends==1 and not state.result.passed and state.result.results[1].actual.value==false)
+end)
+S.test("unsupported Snapshot Source read remains inert before timers or EndTest",function()
+    local state=run({snapshot=true,invalidSnapshot=true})
+    assert(state.ends==0 and #state.delays==0)
 end)
 S.finish()

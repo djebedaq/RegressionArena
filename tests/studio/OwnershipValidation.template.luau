@@ -57,7 +57,7 @@ local ok, reason = pcall(function()
         runner:SetAttribute("RAVersion", "unknown-fixture")
         refuses()
         assert(runner.Parent == container and runner:GetAttribute("RAVersion") == "unknown-fixture")
-        runner:SetAttribute("RAVersion", "0.2.0")
+        runner:SetAttribute("RAVersion", Manager.VERSION)
     end)
     check("modified Source preserved", function()
         local edited = source .. "\n-- RA validation edit"
